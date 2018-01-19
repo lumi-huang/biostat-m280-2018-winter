@@ -14,6 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 **No handwritten homework reports are accepted for this course.** We work with Git and GitHub. Efficient and abundant use of Git, e.g., frequent and well-documented commits, is an important criterion for grading your homework.
 
 1. Apply for the [Student Developer Pack](https://education.github.com/pack) at GitHub using your UCLA email.
+```{BASH}
+```
 
 2. Create a **private** repository `biostat-m280-2018-winter` and add `Hua-Zhou` and `juhkim111` as your collaborators with write permission.
 
