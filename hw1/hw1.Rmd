@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(eval = TRUE)
 ```
 
 ## Q1. Git/GitHub
@@ -53,6 +53,10 @@ Use Linux shell commands to answer following questions.
     ```
 
 2. Which chromosomes does this data set contain? How many SNPs are in each chromosome?
+
+    ```{bash}
+    awk '{print $1}' /home/m280-data/hw1/merge-geno.bim |sort|uniq
+    ```
 
 3. MAP4 (microtubule-associated protein 4) is a gene on chromosome 3 spanning positions 47,892,180 bp -- 48,130,769 bp. How many SNPs are located within MAP4 gene?
 
