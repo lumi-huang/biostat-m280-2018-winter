@@ -48,7 +48,8 @@ Use Linux shell commands to answer following questions.
 1. How many persons are in the data set (statisticians call this `n`)? How many SNPs are in the data set (statisticians call this `p`)?
 
     ```{bash}
-    wc -l /home/m280-data/hw1/merge-geno.fam
+    wc -l /home/m280-data/hw1/merge-geno.fam # number of persons
+    wc -l /home/m280-data/hw1/merge-geno.bim #number of SNPs
     ```
 
 2. Which chromosomes does this data set contain? How many SNPs are in each chromosome?
