@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(eval = TRUE)
+knitr::opts_chunk$set(eval = FALSE)
 ```
 
 ## Q1. Git/GitHub
@@ -47,18 +47,25 @@ Use Linux shell commands to answer following questions.
 
 1. How many persons are in the data set (statisticians call this `n`)? How many SNPs are in the data set (statisticians call this `p`)?
 
-    ```{bash}
-    wc -l /home/m280-data/hw1/merge-geno.fam # number of persons
-    wc -l /home/m280-data/hw1/merge-geno.bim #number of SNPs
-    ```
-
-2. Which chromosomes does this data set contain? How many SNPs are in each chromosome?
 
     ```{bash}
-    awk '{print $1}' /home/m280-data/hw1/merge-geno.bim |sort|uniq
+    wc -l /home/m280-data/hw1/merge-geno.fam
+    wc -l /home/m280-data/hw1/merge-geno.bim
     ```
+
+2. Which chromosomes does this data set contain? How many SNPs are in each chromosome? 
+
+    ```{bash}
+    awk '{print $1}' /home/m280-data/hw1/merge-geno.bim |sort|uniq #chromsome
+    awk '{print $1}' /home/m280-data/hw1/merge-geno.bim |sort|uniq -c #SNPs
+    ```
+
 
 3. MAP4 (microtubule-associated protein 4) is a gene on chromosome 3 spanning positions 47,892,180 bp -- 48,130,769 bp. How many SNPs are located within MAP4 gene?
+
+    ```{bash}
+    awk '$1==3 && $4>= 47892180 && $4<=48130769' /home/m280-data/hw1/merge-geno.bim | wc -l
+    ```
 
 4. Statistical geneticists often have to reformat a data set to feed into various analysis programs. For example, to use the Mendel software <http://www.genetics.ucla.edu/software/mendel>, we have to reformat the data set to be read by Mendel.
 
