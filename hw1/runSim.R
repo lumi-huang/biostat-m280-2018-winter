@@ -39,7 +39,7 @@ meansquarederror = function (seed, n, dist, rep){
       mean1[i] <- mean(x)
       mean2[i] <- estMeanPrimes(x)
     }
-    else if (dist == "t1"){
+    else if (dist == "t5"){
       x <- rt(n, df = 5)
       mean1[i] <- mean(x)
       mean2[i] <- estMeanPrimes(x)
