@@ -146,7 +146,7 @@ for both methods.
           mean1[i] <- mean(x)
           mean2[i] <- estMeanPrimes(x)
           }
-        else if (dist == "t1"){
+        else if (dist == "t5"){
           x <- rt(n, df = 5)
           mean1[i] <- mean(x)
           mean2[i] <- estMeanPrimes(x)
@@ -164,21 +164,23 @@ for both methods.
 2. Modify the [`autoSim.R`](http://hua-zhou.github.io/teaching/biostatm280-2018winter/slides/02-linux/autoSim.R) script to run simulations with combinations of sample sizes `nVals = seq(100, 500, by=100)` and distributions `distTypes = c("gaussian", "t1", "t5")` and write output to appropriately named files. Use `rep = 50`, and `seed = 280`. 
 
     ```{r}
-    source("runSim.R")
+
     export_file = function(seed, rep){
-      distTypes = c("gaussian", "t1", "t5")
-      nVals = seq(100, 500, by=100)
-      for (n in nVals) {
-        for (d in distTypes){
-          oFile = paste("n", n, "dist", d, ".txt", sep="")
-          mse <- meansquarederror(seed, n, d, rep)
-          arg = paste("n=", n, "dist=", d, "mse=", mse, sep=" ")
-          sysCall = paste("nohup Rscript runSim.R ", arg, " > ", oFile)
-          system(sysCall)
-          print(paste("sysCall=", sysCall, sep=""))
-        }
+    distTypes = c("gaussian", "t1", "t5")
+    nVals = seq(100, 500, by=100)
+    for (n in nVals) {
+      for (dist in distTypes){
+      oFile = paste("n", n, "dist", dist, ".txt", sep="")
+      mse <- meansquarederror(seed, n, dist, rep)
+      arg = paste("n=", n, "dist=", dist, "mse=", mse, sep=" ")
+      sysCall = paste("nohup Rscript runSim.R ", arg, " > ", oFile)
+      system(sysCall)
+      print(paste("sysCall=", sysCall, sep=""))
       }
+      
     }
+    }
+    
     export_file(280, 50)
     ```
 
