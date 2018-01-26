@@ -164,6 +164,10 @@ for both methods.
 2. Modify the [`autoSim.R`](http://hua-zhou.github.io/teaching/biostatm280-2018winter/slides/02-linux/autoSim.R) script to run simulations with combinations of sample sizes `nVals = seq(100, 500, by=100)` and distributions `distTypes = c("gaussian", "t1", "t5")` and write output to appropriately named files. Use `rep = 50`, and `seed = 280`. 
 
     ```{r}
+    for (arg in commandArgs(T)) {
+      eval(parse(text=arg))
+    }
+    
     export_file = function(seed, rep){
       distTypes = c("gaussian", "t1", "t5")
       nVals = seq(100, 500, by=100)
@@ -171,20 +175,13 @@ for both methods.
         for (dist in distTypes){
           oFile = paste("n", n, "dist", dist, ".txt", sep="")
           mse <- meansquarederror(seed, n, dist, rep)
-          arg = paste("seed=", seed, "n=", n, "dist=", dist, "rep=", rep, sep=" ")
-          for (arg in commandArgs(T)) {
-            eval(parse(text=arg))
-          }
+          arg = paste("seed=", seed, " n=", n, " dist=", dist, " rep=", rep, sep="")
           sysCall = paste("nohup Rscript runSim.R ", arg, " > ", oFile)
           system(sysCall)
           print(paste("sysCall=", sysCall, sep=""))
         }
       }
     }
-    
-    
-    
-    
     export_file(280, 50)
     ```
 
