@@ -48,6 +48,6 @@ meansquarederror = function (seed, n, dist, rep){
   
   mse1 <- sum((mean1 - 0)^2) / rep #sample average estimator
   mse2 <- sum((mean2 - 0)^2) / rep #primed-indexed average estimator
-  print(mse1)
-  print(mse2)
+  return(c(mse1,mse2))
 }
+meansquarederror(seed, n, dist, rep)
