@@ -105,84 +105,14 @@ $$
 for both methods.
 
     ```{r}
-    ## parsing command arguments
-    for (arg in commandArgs(TRUE)) {
-      eval(parse(text=arg))
-    }
-    
-    ## check if a given integer is prime
-    isPrime = function(n) {
-      if (n <= 3) {
-        return (TRUE)
-        }
-      if (any((n %% 2:floor(sqrt(n))) == 0)) {
-        return (FALSE)
-        }
-      return (TRUE)
-    }
-    ## estimate mean only using observation with prime indices
-    estMeanPrimes = function (x) {
-      n = length(x)
-      ind = sapply(1:n, isPrime)
-      return (mean(x[ind]))
-    }
-    
-
-    
-    # simulate data
-    meansquarederror = function (seed, n, dist, rep){
-      set.seed(seed)
-      mean1 <- vector()
-      mean2 <- vector()
-      
-      for(i in 1:rep) {
-        if (dist == "gaussian"){
-          x <- rnorm(n)
-          mean1[i] <- mean(x)
-          mean2[i] <- estMeanPrimes(x)
-          }
-        else if (dist == "t1"){
-          x <- rt(n, df = 1)
-          mean1[i] <- mean(x)
-          mean2[i] <- estMeanPrimes(x)
-          }
-        else if (dist == "t5"){
-          x <- rt(n, df = 5)
-          mean1[i] <- mean(x)
-          mean2[i] <- estMeanPrimes(x)
-        }
-      }
-
-      mse1 <- sum((mean1 - 0)^2) / rep #sample average estimator
-      mse2 <- sum((mean2 - 0)^2) / rep #primed-indexed average estimator
-      print(mse1)
-      print(mse2)
-    }
+    #please see runSim.R
 
     ```
 
 2. Modify the [`autoSim.R`](http://hua-zhou.github.io/teaching/biostatm280-2018winter/slides/02-linux/autoSim.R) script to run simulations with combinations of sample sizes `nVals = seq(100, 500, by=100)` and distributions `distTypes = c("gaussian", "t1", "t5")` and write output to appropriately named files. Use `rep = 50`, and `seed = 280`. 
 
-    ```{r}
-    for (arg in commandArgs(T)) {
-      eval(parse(text=arg))
-    }
-    
-    export_file = function(seed, rep){
-      distTypes = c("gaussian", "t1", "t5")
-      nVals = seq(100, 500, by=100)
-      for (n in nVals) {
-        for (dist in distTypes){
-          oFile = paste("n", n, "dist", dist, ".txt", sep="")
-          mse <- meansquarederror(seed, n, dist, rep)
-          arg = paste("seed=", seed, " n=", n, " dist=", dist, " rep=", rep, sep="")
-          sysCall = paste("nohup Rscript runSim.R ", arg, " > ", oFile)
-          system(sysCall)
-          print(paste("sysCall=", sysCall, sep=""))
-        }
-      }
-    }
-    export_file(280, 50)
+    ```{bash}
+    Rscript autoSim.R
     ```
 
 
