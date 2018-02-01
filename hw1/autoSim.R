@@ -1,3 +1,4 @@
+#autoSim.R
 seed <- 280
 rep <- 50
 
