@@ -11,8 +11,10 @@ final_table <- cbind(c("100", "", "200", "", "300", "", "400", "", "500", ""),
                      final_table)
 colnames(final_table) <- c("n", "Method", "Gaussian", "t1", "t5")
 dataframe <- as.data.frame(final_table)
-final_dataframe <- dataframe[,c(1,2,4,5,3)]
+final_dataframe <- dataframe[, c(1,2,4,5,3)]
 
 library(knitr)
-kable(final_dataframe, format = "markdown")
+library(kableExtra)
+options(knitr.table.format = "markdown") 
 
+kable(final_dataframe)
