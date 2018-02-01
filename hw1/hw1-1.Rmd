@@ -110,7 +110,6 @@ for both methods.
 
     ```{r}
     #please see runSim.R
-
     ```
 
 2. Modify the [`autoSim.R`](http://hua-zhou.github.io/teaching/biostatm280-2018winter/slides/02-linux/autoSim.R) script to run simulations with combinations of sample sizes `nVals = seq(100, 500, by=100)` and distributions `distTypes = c("gaussian", "t1", "t5")` and write output to appropriately named files. Use `rep = 50`, and `seed = 280`. 
@@ -141,5 +140,16 @@ for both methods.
     Rscript exportdata.R
     ```
 
-
+|n   |Method   |t1        |t5          |Gaussian    |
+|:---|:--------|:---------|:-----------|:-----------|
+|100 |SampAvg  |230.2372  |0.01675078  |0.00948339  |
+|    |PrimeAvg |2808.4257 |0.06642844  |0.04146737  |
+|200 |SampAvg  |95.87976  |0.007666523 |0.007163651 |
+|    |PrimeAvg |799.31393 |0.041847883 |0.018754358 |
+|300 |SampAvg  |53.57742  |0.00547106  |0.003534446 |
+|    |PrimeAvg |446.40235 |0.02412243  |0.020025445 |
+|400 |SampAvg  |20.5337   |0.003517023 |0.002970676 |
+|    |PrimeAvg |19.45133  |0.024331412 |0.011268897 |
+|500 |SampAvg  |20.7878   |0.003354976 |0.002591991 |
+|    |PrimeAvg |217.2689  |0.011676282 |0.011176895 |
 
