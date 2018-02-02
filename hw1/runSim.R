@@ -1,6 +1,6 @@
 ## parsing command arguments
 for (arg in commandArgs(TRUE)) {
-  eval(parse(text=arg))
+  eval(parse(text = arg))
 }
 
 ## check if a given integer is prime
