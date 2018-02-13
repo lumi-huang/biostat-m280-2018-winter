@@ -10,13 +10,22 @@ Read Chapter 7 (Exploratory Data Analysis) of R for Data Science and do exercise
 1.Explore the distribution of each of the x, y, and z variables in diamonds. What do you learn? Think about a diamond and how you might decide which dimension is the length, width, and depth.
 
 ```{r}
+library(tidyverse)
+#examining the distribution of x, y, z
+ggplot(data = diamonds) + geom_histogram(mapping = aes(x), binwidth = 0.5)
+ggplot(data = diamonds) + geom_histogram(mapping = aes(y), binwidth = 0.5) + 
+  coord_cartesian(xlim = c(0, 15))
+ggplot(data = diamonds) + geom_histogram(mapping = aes(z), binwidth = 0.5) +
+  coord_cartesian(xlim = c(0,10))
 
+#I learnt that there are some outliers in y and z by the evidence of the unusually wide limits on the x-axis. Based on the distribution of x, y, z without outliers, we can say x, y are the length and width of diamonds, and z is the depth of diamonds.
 
 ```
 
 2.Explore the distribution of price. Do you discover anything unusual or surprising? (Hint: Carefully think about the binwidth and make sure you try a wide range of values.)
 ```{r}
-
+ggplot(data = diamonds) + 
+  geom_histogram(mapping = aes(x = price), binwidth = 100)
 ```
 
 3.How many diamonds are 0.99 carat? How many are 1 carat? What do you think is the cause of the difference?
