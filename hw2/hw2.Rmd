@@ -24,13 +24,28 @@ ggplot(data = diamonds) + geom_histogram(mapping = aes(z), binwidth = 0.5) +
 
 2.Explore the distribution of price. Do you discover anything unusual or surprising? (Hint: Carefully think about the binwidth and make sure you try a wide range of values.)
 ```{r}
+#small value for binwidth
 ggplot(data = diamonds) + 
-  geom_histogram(mapping = aes(x = price), binwidth = 100)
+  geom_histogram(mapping = aes(x = price), binwidth = 10)
+
+#try a wide range of values
+ggplot(data = diamonds) + 
+  geom_histogram(mapping = aes(x = price), binwidth = 150)
+
+#The distribution of price is very positively skewed. It looks like there is a lower bound for the price of diamonds based on the distribution of price.
 ```
 
 3.How many diamonds are 0.99 carat? How many are 1 carat? What do you think is the cause of the difference?
 ```{r}
+carat_0.99 <- diamonds %>%
+  filter(carat == 0.99)
+count(carat_0.99)
 
+carat_1 <- diamonds %>%
+  filter(carat == 1)
+count(carat_1)
+
+#there are 23 diamonds that are 0.99 carat, and 1558 diamonds that are 1 carat
 ```
 
 
