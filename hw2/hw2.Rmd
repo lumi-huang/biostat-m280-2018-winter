@@ -9,83 +9,101 @@ Read Chapter 7 (Exploratory Data Analysis) of R for Data Science and do exercise
 7.3.4
 1.Explore the distribution of each of the x, y, and z variables in diamonds. What do you learn? Think about a diamond and how you might decide which dimension is the length, width, and depth.
 
-```{r}
-library(tidyverse)
-#examining the distribution of x, y, z
-ggplot(data = diamonds) + geom_histogram(mapping = aes(x), binwidth = 0.5)
-ggplot(data = diamonds) + geom_histogram(mapping = aes(y), binwidth = 0.5) + 
-  coord_cartesian(xlim = c(0, 15))
-ggplot(data = diamonds) + geom_histogram(mapping = aes(z), binwidth = 0.5) +
-  coord_cartesian(xlim = c(0,10))
-
-#I learnt that there are some outliers in y and z by the evidence of the unusually wide limits on the x-axis. Based on the distribution of x, y, z without outliers, we can say x, y are the length and width of diamonds, and z is the depth of diamonds.
-
-```
+    ```{r}
+    library(tidyverse)
+    #examining the distribution of x, y, z
+    ggplot(data = diamonds) + geom_histogram(mapping = aes(x), binwidth = 0.5)
+    ggplot(data = diamonds) + geom_histogram(mapping = aes(y), binwidth = 0.5) + 
+      coord_cartesian(xlim = c(0, 15))
+    ggplot(data = diamonds) + geom_histogram(mapping = aes(z), binwidth = 0.5) +
+      coord_cartesian(xlim = c(0,10))
+    
+    #I learnt that there are some outliers in y and z by the evidence of the unusually wide limits on the x-axis. Based on the distribution of x, y, z without outliers, we can say x, y are the length and width of diamonds, and z is the depth of diamonds.
+    
+    ```
 
 2.Explore the distribution of price. Do you discover anything unusual or surprising? (Hint: Carefully think about the binwidth and make sure you try a wide range of values.)
-```{r}
-#small value for binwidth
-ggplot(data = diamonds) + 
-  geom_histogram(mapping = aes(x = price), binwidth = 10)
-
-#try a wide range of values
-ggplot(data = diamonds) + 
-  geom_histogram(mapping = aes(x = price), binwidth = 150)
-
-#The distribution of price is very positively skewed. It looks like there is a lower bound for the price of diamonds based on the distribution of price.
-```
+    ```{r}
+    #small value for binwidth
+    ggplot(data = diamonds) + 
+      geom_histogram(mapping = aes(x = price), binwidth = 10)
+    
+    #try a wide range of values
+    ggplot(data = diamonds) + 
+      geom_histogram(mapping = aes(x = price), binwidth = 150)
+    
+    #The distribution of price is very positively skewed. It looks like there is a lower bound for the price of diamonds based on the distribution of price.
+    ```
 
 3.How many diamonds are 0.99 carat? How many are 1 carat? What do you think is the cause of the difference?
-```{r}
-carat_0.99 <- diamonds %>%
-  filter(carat == 0.99)
-count(carat_0.99)
-
-carat_1 <- diamonds %>%
-  filter(carat == 1)
-count(carat_1)
-
-mean(carat_0.99$price)
-mean(carat_1$price)
-
-#there are 23 diamonds that are 0.99 carat, and 1558 diamonds that are 1 carat. The price differences between 0.99 carat and 1 carat diamonds could be the cause of this difference. Because 1 carat diamond is about $800 more expensive than 0.99 carat diamond, we expect to see more 1 carat diamonds than 0.99 carat diamonds even if the other figures are about the same.
-```
+    ```{r}
+    carat_0.99 <- diamonds %>%
+      filter(carat == 0.99)
+    count(carat_0.99)
+    
+    carat_1 <- diamonds %>%
+      filter(carat == 1)
+    count(carat_1)
+    
+    mean(carat_0.99$price)
+    mean(carat_1$price)
+    
+    #there are 23 diamonds that are 0.99 carat, and 1558 diamonds that are 1 carat. The price differences between 0.99 carat and 1 carat diamonds could be the cause of this difference. Because 1 carat diamond is about $800 more expensive than 0.99 carat diamond, we expect to see more 1 carat diamonds than 0.99 carat diamonds even if the other figures are about the same.
+    ```
 
 
 4.Compare and contrast coord_cartesian() vs xlim() or ylim() when zooming in on a histogram. What happens if you leave binwidth unset? What happens if you try and zoom so only half a bar shows?
-```{r}
+    ```{r}
+    
+    #coor_cartesian
+    ggplot(data = diamonds) + 
+      geom_histogram(mapping = aes(x = price), binwidth = 100) +
+      coord_cartesian(xlim = c(0, 10000))
+    
+    #xlim()
+    ggplot(data = diamonds) +
+      geom_histogram(mapping = aes(x = price), binwidth = 100) + xlim(0, 10000)
+    
+    
+    
+    #leave binwidth unset
+    ggplot(data = diamonds) + 
+      geom_histogram(mapping = aes(x = price)) +
+      coord_cartesian(xlim = c(0, 5000))
+    
+    #zoom so only half a bar shows
+    ggplot(data = diamonds) + 
+      geom_histogram(mapping = aes(x = price), binwidth = 100) +
+      coord_cartesian(xlim = c(0, 50))
+    ```
 
-#coor_cartesian
-ggplot(data = diamonds) + 
-  geom_histogram(mapping = aes(x = price), binwidth = 100) +
-  coord_cartesian(xlim = c(0, 10000))
+Coor_cartesian and xlim() generate the same shape when zooming in on a histogram. The difference lies on how they process the zoom-in command. Coor_cartesian simply zoom in the data in the given limits (the histogram is not affected) while xlim() removes the data that fall outside of the boundary first, then calculate the histogram.
+When we leave binwidth unset, r studio uses bins = 30 as default setting.
+When the boundary contains only half a bar, rstudio does not show anything on the historgram.
 
-#xlim()
-ggplot(data = diamonds) +
-  geom_histogram(mapping = aes(x = price), binwidth = 100) + xlim(0, 10000)
-
-#coor_cartesian and xlim() generate the same shape when zooming in on a histogram. The difference lies on how they process the zoom-in command. coor_cartesian zoom in the data while xlim() removes the data that fall outside of the boundary.
-
-#leave binwidth unset
-ggplot(data = diamonds) + 
-  geom_histogram(mapping = aes(x = price)) +
-  coord_cartesian(xlim = c(0, 5000))
-#When we leave binwidth unset, r studio uses bins = 30 as default setting.
-
-#zoom so only half a bar shows
-ggplot(data = diamonds) + 
-  geom_histogram(mapping = aes(x = price), binwidth = 100) +
-  coord_cartesian(xlim = c(0, 50))
-#When the boundary contains only half a bar, rstudio does not show anything on the historgram.
-
-```
 
 7.4.1
 1.What happens to missing values in a histogram? What happens to missing values in a bar chart? Why is there a difference?
-```{r}
+    ```{r}
+    #histogram
+    diamonds %>%
+      mutate(x = ifelse(x < 3 | x > 15, NA, x)) %>%
+      ggplot(data = diamonds2, mapping = aes(x)) + 
+      geom_histogram(binwidth = 0.5)
+    
+    
+    #bar
+    diamonds %>%
+      mutate(cut = if_else(runif(n()) < 0.1, NA_character_,
+                           as.character((cut)))) %>%
+      ggplot(diamonds, mapping = aes(x = cut)) +
+      geom_bar()
 
-```
+    ```
 
+Missing values in a histogram are removed when calculating the histogram. We can see that from the warning message "Removed 8 rows containing non-finite values (stat_bin)."
+
+Missing values in a bar chart are treated as a new categories because the x-axis variable should be a discrete value for bar chart.
 
 2.What does na.rm = TRUE do in mean() and sum()?
 ```{r}
