@@ -11,16 +11,18 @@ Read Chapter 7 (Exploratory Data Analysis) of R for Data Science and do exercise
 
     ```{r}
     library(tidyverse)
+    library(viridisLite)
+    library(forcats)
+    library(nycflights13)
     #examining the distribution of x, y, z
     ggplot(data = diamonds) + geom_histogram(mapping = aes(x), binwidth = 0.5)
     ggplot(data = diamonds) + geom_histogram(mapping = aes(y), binwidth = 0.5) + 
       coord_cartesian(xlim = c(0, 15))
     ggplot(data = diamonds) + geom_histogram(mapping = aes(z), binwidth = 0.5) +
       coord_cartesian(xlim = c(0,10))
-    
-    #I learnt that there are some outliers in y and z by the evidence of the unusually wide limits on the x-axis. Based on the distribution of x, y, z without outliers, we can say x, y are the length and width of diamonds, and z is the depth of diamonds.
-    
     ```
+I learnt that there are some outliers in y and z by the evidence of the unusually wide limits on the x-axis. Based on the distribution of x, y, z without outliers, we can say x, y are the length and width of diamonds, and z is the depth of diamonds.
+
 
 2.Explore the distribution of price. Do you discover anything unusual or surprising? (Hint: Carefully think about the binwidth and make sure you try a wide range of values.)
     ```{r}
@@ -32,8 +34,9 @@ Read Chapter 7 (Exploratory Data Analysis) of R for Data Science and do exercise
     ggplot(data = diamonds) + 
       geom_histogram(mapping = aes(x = price), binwidth = 150)
     
-    #The distribution of price is very positively skewed. It looks like there is a lower bound for the price of diamonds based on the distribution of price.
     ```
+The distribution of price is very positively skewed. It looks like there is a lower bound for the price of diamonds based on the distribution of price.
+
 
 3.How many diamonds are 0.99 carat? How many are 1 carat? What do you think is the cause of the difference?
     ```{r}
@@ -48,8 +51,9 @@ Read Chapter 7 (Exploratory Data Analysis) of R for Data Science and do exercise
     mean(carat_0.99$price)
     mean(carat_1$price)
     
-    #there are 23 diamonds that are 0.99 carat, and 1558 diamonds that are 1 carat. The price differences between 0.99 carat and 1 carat diamonds could be the cause of this difference. Because 1 carat diamond is about $800 more expensive than 0.99 carat diamond, we expect to see more 1 carat diamonds than 0.99 carat diamonds even if the other figures are about the same.
+
     ```
+There are 23 diamonds that are 0.99 carat, and 1558 diamonds that are 1 carat. The price differences between 0.99 carat and 1 carat diamonds could be the cause of this difference. Because 1 carat diamond is about $800 more expensive than 0.99 carat diamond, we expect to see more 1 carat diamonds than 0.99 carat diamonds even if the other figures are about the same.
 
 
 4.Compare and contrast coord_cartesian() vs xlim() or ylim() when zooming in on a histogram. What happens if you leave binwidth unset? What happens if you try and zoom so only half a bar shows?
@@ -88,7 +92,7 @@ When the boundary contains only half a bar, rstudio does not show anything on th
     #histogram
     diamonds %>%
       mutate(x = ifelse(x < 3 | x > 15, NA, x)) %>%
-      ggplot(data = diamonds2, mapping = aes(x)) + 
+      ggplot(data = diamonds, mapping = aes(x)) + 
       geom_histogram(binwidth = 0.5)
     
     
@@ -102,19 +106,43 @@ When the boundary contains only half a bar, rstudio does not show anything on th
     ```
 
 Missing values in a histogram are removed when calculating the histogram. We can see that from the warning message "Removed 8 rows containing non-finite values (stat_bin)."
-
 Missing values in a bar chart are treated as a new categories because the x-axis variable should be a discrete value for bar chart.
 
-2.What does na.rm = TRUE do in mean() and sum()?
-```{r}
 
-```
+2.What does na.rm = TRUE do in mean() and sum()?
+    ```{r}
+    mean(c(1, 3, 6, NA, 7), na.rm = TRUE)
+    sum(c(5, 8, 2, NA, NA, 23), na.rm = TRUE)
+    ```
+na.rm = TRUE removes the NA values before calculating mean and sum
+
 
 7.5.1.1
 1.Use what you’ve learned to improve the visualisation of the departure times of cancelled vs. non-cancelled flights.
-```{r}
-
-```
+    ```{r}
+    #change count to density
+    nycflights13::flights %>% 
+      mutate(
+        cancelled = is.na(dep_time),
+        sched_hour = sched_dep_time %/% 100,
+        sched_min = sched_dep_time %% 100,
+        sched_dep_time = sched_hour + sched_min / 60
+      ) %>% 
+      ggplot(mapping = aes(x = sched_dep_time, y = ..density..)) + 
+        geom_freqpoly(mapping = aes(colour = cancelled), binwidth = 1/4)
+    
+    #boxplot
+    nycflights13::flights %>% 
+      mutate(
+        cancelled = is.na(dep_time),
+        sched_hour = sched_dep_time %/% 100,
+        sched_min = sched_dep_time %% 100,
+        sched_dep_time = sched_hour + sched_min / 60
+      ) %>% 
+      ggplot() +
+      geom_boxplot(mapping = aes(x = cancelled, y = sched_dep_time))
+    ```
+We can see cancelled flights have a higher scheduled departure time than non-cancelled flights.
 
 
 2.What variable in the diamonds dataset is most important for predicting the price of a diamond? How is that variable correlated with cut? Why does the combination of those two relationships lead to lower quality diamonds being more expensive?
