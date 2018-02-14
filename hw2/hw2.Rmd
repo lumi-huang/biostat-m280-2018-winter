@@ -19,6 +19,11 @@ Read [Chapter 7](http://r4ds.had.co.nz/exploratory-data-analysis.html) (Explorat
 
 
 ```{r}
+if (!require("tidyverse")) 
+     install.packages("tidyverse", repos='http://cran.us.r-project.org')
+if (!require("viridis")) 
+     install.packages("viridis", repos='http://cran.us.r-project.org')
+
 library(tidyverse)
 library(viridisLite)
 library(forcats)
@@ -299,20 +304,41 @@ Redo HW1 Q2 using tidyverse.
 1. How many persons are in the data set (statisticians call this `n`)? How many SNPs are in the data set (statisticians call this `p`)?
 ```{r}
 setwd(".")
-mergegeno_bim <- read.table("/home/m280-data/hw1/merge-geno.bim")
-mergegeno_fam <- read.table("/home/m280-data/hw1/merge-geno.fam")
+mergegeno_bim <- read.table("/home/m280-data/hw1/merge-geno.bim",
+                            col.names = c("Chromosome", "SNPID", 
+                                          "GeneticDistance", 
+                                          "BasePairPosition", "Allele1", 
+                                          "Allele2"))
+mergegeno_fam <- read.table("/home/m280-data/hw1/merge-geno.fam",
+                            col.names = c("FamilyID", "PersonID", "FatherID",
+                                          "MotherID", "Sex", "AffectionStatus"))
 
 #numbers of persons in the data set
-nrow(mergegeno_fam)
+mergegeno_fam %>%
+  count()
 #numbers of SNPs in the data set
-nrow(mergegeno_bim)
+mergegeno_bim %>%
+  count()
 
 ```
 
 
 2. Which chromosomes does this data set contain? How many SNPs are in each chromosome?
+```{r}
+#chromsomes
+mergegeno_bim %>%
+  count(Chromosome)
+```
+
+
 
 3. MAP4 (microtubule-associated protein 4) is a gene on chromosome 3 spanning positions 47,892,180 bp -- 48,130,769 bp. How many SNPs are located within MAP4 gene?
+```{r}
+mergegeno_bim %>%
+  filter(BasePairPosition > 47892180 && BasePairPosition < 48130769) %>%
+  count(Chromosome)
+```
+
 
 4. Statistical geneticists often have to reformat a data set to feed into various analysis programs. For example, to use the Mendel software <http://www.genetics.ucla.edu/software/mendel>, we have to reformat the data set to be read by Mendel.
 
