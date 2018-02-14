@@ -297,6 +297,18 @@ The outputs are exactly the same. The only difference is in the way we labeled x
 Redo HW1 Q2 using tidyverse.
 
 1. How many persons are in the data set (statisticians call this `n`)? How many SNPs are in the data set (statisticians call this `p`)?
+```{r}
+setwd(".")
+mergegeno_bim <- read.table("/home/m280-data/hw1/merge-geno.bim")
+mergegeno_fam <- read.table("/home/m280-data/hw1/merge-geno.fam")
+
+#numbers of persons in the data set
+nrow(mergegeno_fam)
+#numbers of SNPs in the data set
+nrow(mergegeno_bim)
+
+```
+
 
 2. Which chromosomes does this data set contain? How many SNPs are in each chromosome?
 
