@@ -372,7 +372,11 @@ While we see a pattern that as carat increases, price increase, we also observe 
 
 4.Combine two of the techniques you’ve learned to visualise the combined distribution of cut, carat, and price.
 ```{r}
-
+diamonds %>%
+  group_by(cut, color) %>%
+  summarise(avg_price = mean(price)) %>%
+  ggplot(mapping = aes(x = cut, y = color)) +
+  geom_tile(mapping = aes(fill = avg_price))
 ```
 
 
