@@ -262,14 +262,25 @@ Violin plot shows multimodal data, and is better in discribing a distribution. H
 if (!require("ggbeeswarm")) 
      install.packages("ggbeeswarm", repos='http://cran.us.r-project.org')
 library(ggbeeswarm)
-```
 
+diamonds %>%
+  ggplot() + 
+  geom_quasirandom(mapping = aes(x = cut, y = price))
+
+```
+It is similar to violin on how it expressed the density with width.
 
 7.5.2.1
 1.How could you rescale the count dataset above to more clearly show the distribution of cut within colour, or colour within cut?
 ```{r}
-
+diamonds %>% 
+  count(color, cut) %>% 
+  group_by(color) %>%
+  mutate(percentile = n / sum(n)) %>%
+  ggplot(mapping = aes(x = color, y = cut)) +
+  geom_tile(mapping = aes(fill = percentile))
 ```
+Rescale the count dataset to percentile shows how the data is distributed. For instance, we can see diamonds with ideal cut and color D have a higher percentile.
 
 2.Use geom_tile() together with dplyr to explore how average flight delays vary by destination and month of year. What makes the plot difficult to read? How could you improve it?
 ```{r}
