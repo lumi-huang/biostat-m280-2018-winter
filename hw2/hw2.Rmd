@@ -284,8 +284,25 @@ Rescale the count dataset to percentile shows how the data is distributed. For i
 
 2.Use geom_tile() together with dplyr to explore how average flight delays vary by destination and month of year. What makes the plot difficult to read? How could you improve it?
 ```{r}
+top_dest <- nycflights13::flights %>%
+  group_by(dest) %>%
+  count() %>%
+  arrange(desc(n)) %>%
+  .[1:10,]
+
+top_dest
+
+
+  sched_dep_time
+  ggplot(mapping = aes(x = month, y = dest)) +
+  geom_tile(mapping = aes(fill = dep_delay))
+
+nycflights13::flights
+  
+
 
 ```
+There are too many destinations in the plot that makes plot hard to read.
 
 3.Why is it slightly better to use aes(x = color, y = cut) rather than aes(x = cut, y = color) in the example above?
 ```{r}
