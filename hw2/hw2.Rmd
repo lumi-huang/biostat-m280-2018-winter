@@ -339,9 +339,21 @@ When we use aes(x = color, y = cut), we get the shape of the tile that is closer
 #7.5.3.1
 1.Instead of summarising the conditional distribution with a boxplot, you could use a frequency polygon. What do you need to consider when using cut_width() vs cut_number()? How does that impact a visualisation of the 2d distribution of carat and price?
 ```{r}
+if (!require("hexbin")) 
+     install.packages("hexbin", repos='http://cran.us.r-project.org')
+diamonds %>%
+  filter(carat < 3) %>%
+  ggplot() +
+  geom_freqpoly(aes(x = price, color = cut_width(carat, 0.25)))
+
+diamonds %>%
+  filter(carat < 3) %>%
+  ggplot() +
+  geom_freqpoly(aes(x = price, color = cut_number(carat, 11)))
+
 
 ```
-
+We can see from the plots that, for cut_width, the intervals of carat are the same, and we get fewer diamonds on the right side bins. For cut_number, the size of the intervals vary, and we get more diamonds on the right side bins.
 
 2.Visualise the distribution of carat, partitioned by price.
 ```{r}
