@@ -444,10 +444,20 @@ mendo_bim <- mergegeno_bim %>%
 
 text <- c("2.40 = FILE FORMAT VERSION NUMBER.",
           "8348674  = NUMBER OF SNPS LISTED HERE.")
-write_lines(text, path = "/home/m280-data/hw1/mendo_bim.txt", append = TRUE)
+write_lines(text, 
+            path = "/home/luminghuang/biostat-m280-2018-winter/hw2/md_bim.txt", 
+            append = TRUE)
 
-head(mendo_bim)
+write_tsv(mendo_bim,
+          path = "/home/luminghuang/biostat-m280-2018-winter/hw2/md_bim.txt", 
+          append = TRUE, col_names = FALSE)
+
 ```
+
+```{bash}
+head /home/luminghuang/biostat-m280-2018-winter/hw2/md_bim.txt
+```
+
 
     
     - Mendel's pedigree file is similar to the plink `fam` file but has format  
