@@ -470,9 +470,16 @@ mendo_fam <- mergegeno_fam %>%
   select(one_of(c("FamilyID", "PersonID", "FatherID", "MotherID", "Sex"))) %>%
   mutate(TwinStatus = "") %>%
   unite(col = "", sep = ",")
-head(mendo_fam)
+
+
+write_delim(mendo_fam,
+          path = "/home/luminghuang/biostat-m280-2018-winter/hw2/md_fam.txt", 
+          append = TRUE, col_names = FALSE)
 ```
 
+```{bash}
+head /home/luminghuang/biostat-m280-2018-winter/hw2/md_fam.txt
+```
 
 
 
