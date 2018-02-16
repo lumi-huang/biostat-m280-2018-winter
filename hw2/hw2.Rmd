@@ -39,6 +39,7 @@ ggplot(data = diamonds) + geom_histogram(mapping = aes(y), binwidth = 0.5) +
 ggplot(data = diamonds) + geom_histogram(mapping = aes(z), binwidth = 0.5) +
   coord_cartesian(xlim = c(0, 10))
 ```
+
 I learnt that there are some outliers in y and z by the evidence of the unusually wide limits on the x-axis. Based on the distribution of x, y, z without outliers, we can say x, y are the length and width of diamonds, and z is the depth of diamonds.
 
 
@@ -54,6 +55,7 @@ ggplot(data = diamonds) +
   geom_histogram(mapping = aes(x = price), binwidth = 150)
 
 ```
+
 The distribution of price is very positively skewed. It looks like there is a lower bound for the price of diamonds based on the distribution of price.
 
 
@@ -95,13 +97,13 @@ ggplot(data = diamonds) +
 
 #zoom so only half a bar shows
 ggplot(data = diamonds) + 
-  geom_histogram(mapping = aes(x = price), binwidth = 100) +
-  coord_cartesian(xlim = c(0, 150))
+  geom_histogram(mapping = aes(x = price), binwidth = 500) +
+  coord_cartesian(xlim = c(0, 1250))
 ```
 
 Coor_cartesian and xlim() generate the same shape when zooming in on a histogram. The difference lies on how they process the zoom-in command. Coor_cartesian simply zoom in the data in the given limits (the histogram is not affected) while xlim() removes the data that fall outside of the boundary first, then calculate the histogram.
 When we leave binwidth unset, r studio uses bins = 30 as default setting.
-When the boundary contains only half a bar, rstudio does not show anything on the historgram.
+When the boundary cut at the middle of bin, rstudio shows only half a bar.
 
 
 7.4.1
@@ -161,6 +163,7 @@ nycflights13::flights %>%
   geom_boxplot(mapping = aes(x = cancelled, y = sched_dep_time))
 
 ```
+
 We can see cancelled flights have a higher scheduled departure time than non-cancelled flights.
 
 
@@ -217,6 +220,7 @@ diamonds %>%
   geom_boxplot(mapping = aes(x = reorder(cut, carat, FUN = median), y = carat))
 
 ```
+
 Carat is the most important for predicting the price of a diamond. Carat and the price of the diamond have a positive relationship. When there is an increase in carat, the price of the diamond increases as well. We examined the relationship between cut and carat. We can see that the fair diamonds have higher carat in average, and higher carat is related to higher diamond price. The combination of these two relationship lead to lower quality diamonds being more expensive.
 
 
@@ -235,6 +239,7 @@ ggplot(data = diamonds) +
   geom_boxploth(mapping = aes(y = reorder(cut, carat, FUN = mean), x = carat))
   
 ```
+
 The outputs are exactly the same. The only difference is in the way we labeled x and y axis.
 
 
@@ -248,6 +253,7 @@ diamonds %>%
   ggplot() + 
   geom_lv(mapping = aes(x = cut, y = price))
 ```
+
 Compared to boxplot, letter value plot gives more information about the distribution.
 
 5.Compare and contrast geom_violin() with a facetted geom_histogram(), or a coloured geom_freqpoly(). What are the pros and cons of each method?
@@ -261,6 +267,7 @@ diamonds %>%
   geom_histogram(mapping = aes(x = price)) + 
   facet_wrap(~cut)
 ```
+
 Violin plot shows multimodal data, and is better in discribing a distribution. However, in violin plot, we cannot find the number of observations count. While in histogram, we can see the number of observations, but the bin size may change the shape of the distribution.
 
 6.If you have a small dataset, it’s sometimes useful to use geom_jitter() to see the relationship between a continuous and categorical variable. The ggbeeswarm package provides a number of methods similar to geom_jitter(). List them and briefly describe what each one does.
@@ -274,6 +281,7 @@ diamonds %>%
   geom_quasirandom(mapping = aes(x = cut, y = price))
 
 ```
+
 It is similar to violin on how it expressed the density with width.
 
 7.5.2.1
@@ -286,6 +294,7 @@ diamonds %>%
   ggplot(mapping = aes(x = color, y = cut)) +
   geom_tile(mapping = aes(fill = percentile))
 ```
+
 Rescale the count dataset to percentile shows how the data is distributed. For instance, we can see diamonds with ideal cut and color D have a higher percentile.
 
 2.Use geom_tile() together with dplyr to explore how average flight delays vary by destination and month of year. What makes the plot difficult to read? How could you improve it?
@@ -323,6 +332,7 @@ nycflights13::flights %>%
 
 
 ```
+
 There are too many destinations and missing value in the original plot. We can improve by sorting the plot with average delay or by replacing missing value.
 sol from https://www.patrickjomalley.com/2017/11/exploratory-data-analysis/#exercises-2
 
@@ -360,6 +370,7 @@ diamonds %>%
 
 
 ```
+
 We can see from the plots that, for cut_width, the intervals of carat are the same, and we get fewer diamonds on the right side bins. For cut_number, the size of the intervals vary, and we get more diamonds on the right side bins.
 
 
@@ -398,6 +409,7 @@ ggplot(data = diamonds) +
   geom_bin2d(mapping = aes(x = x, y = y)) +
   coord_cartesian(xlim = c(4, 11), ylim = c(4, 11))
 ```
+
 We prefer scatterplot because scatterplot shows the data distribution by individual dot, and it is easier to see the outlier.
 
 ## Q3
@@ -452,7 +464,7 @@ mendo_bim <- mergegeno_bim %>%
   select(one_of(c("SNPID", "Chromosome", "BasePairPosition"))) %>%
   unite(SNPID, Chromosome, BasePairPosition, col = "", sep = ",")
 
-text <- c("2.40 = FILE FORMAT VERSION NUMBER.",
+text <- c("     2.40 = FILE FORMAT VERSION NUMBER.",
           "8348674  = NUMBER OF SNPS LISTED HERE.")
 write_lines(text, 
             path = "/home/luminghuang/biostat-m280-2018-winter/hw2/md_bim.txt", 
