@@ -52,23 +52,60 @@ limit 5
 
 ```
 
-1. How many tickets are in this data set? Which time period do these tickets span? Which years have most data?
+1. How many tickets are in this data set?  
 
 
 ```{sql connection="db"}
-select count(*) from latix
+select count(*) from latix;
+
+```
+Which time period do these tickets span?
+```{sql connection="db"}
+select min(Issue_Year), max(Issue_Year) from latix;
+```
+```{sql connection="db"}
+select min(Issue_Month) from latix
+where Issue_Year = '2010';
 
 ```
 ```{sql connection="db"}
-select min(Issue_Year), max(Issue_Year) from latix
+select min(Issue_Day) from latix
+where Issue_Year = '2010' and Issue_Month = '4';
 ```
 ```{sql connection="db"}
+select max(Issue_Month) from latix
+where Issue_Year = '2017';
 
 ```
 
+```{sql connection="db"}
+select max(Issue_Day) from latix
+where Issue_Year = '2017' and Issue_Month = '12';
+```
+tickets span from 2010/04/27 to 2017/12/30
+
+Which years have most data?
+```{sql connection="db"}
+select Issue_Year, count(*) from latix
+group by Issue_Year
+order by count(*) desc;
+```
+2015 has most data
 
 
 0. When (which hour, weekday, month day, and month) are you most likely to get a ticket and when are you least likely to get a ticket?
+```{sql connection="db"}
+select Issue_Month, Issue_Day, Issue_Hour, count(*) from latix
+group by Issue_Month, Issue_Day, Issue_Hour
+order by count(*) desc
+limit 5;
+```
+```{sql connection="db"}
+select Issue_Month, Issue_Day, Issue_Hour, count(*) from latix
+group by Issue_Month, Issue_Day, Issue_Hour
+order by count(*)
+limit 5;
+```
 
 0. Which car makes received most citations?
 
