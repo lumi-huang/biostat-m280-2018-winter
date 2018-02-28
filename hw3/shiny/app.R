@@ -10,8 +10,13 @@
 library(shiny)
 library(tidyverse)
 setwd(".")
-LCEP <- readRDS("/home/luminghuang/biostat-m280-2018-winter/hw3/LCEP.rds")
-head(LCEP)
+LCEP <- read_rds("/home/luminghuang/biostat-m280-2018-winter/hw3/LCEP.rds")
+
+LCEP$Base_Pay <- as.numeric(gsub('\\$', '', LCEP$`Base Pay`))
+LCEP$Overtime_Pay <- as.numeric(gsub('\\$', '', LCEP$`Overtime Pay`))
+LCEP$Other_Pay_Payroll_Explorer <- as.numeric(
+  gsub('\\$', '', LCEP$`Other Pay (Payroll Explorer)`))
+
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -23,8 +28,7 @@ ui <- fluidPage(
    sidebarLayout(
       sidebarPanel(
         helpText("Total payroll by LA City"),
-        #Visualize the total LA City payroll of each year, with breakdown into 
-        #base pay, overtime pay, and other pay
+        
         selectInput("pay",
                     label = "Choose a pay type",
                     choices = c("Base Pay", "Overtime Pay", "Other Pay"),
@@ -40,17 +44,19 @@ ui <- fluidPage(
 
 
 server <- function(input, output) {
-     pay_type <- reactive({
-       switch(LCEP$pay,
-              "Base Pay" = LCEP$`Base Pay`,
-              "Overtime Pay" = LCEP$`Overtime Pay`,
-              "Other Pay" = LCEP$`Other Pay (Payroll Explorer)`)
-     })
-     year <- LCEP$Year
-     
-     output$plot <- renderPlot()
-
-
+  output$TPLC <- renderPlot({
+    col_name <- switch(input$pay,
+             "Base Pay" = "Base_Pay",
+             "Overtime Pay" = "Overtime_Pay",
+             "Other Pay" = "Other_Pay_Payroll_Explorer")
+    
+    LCEP %>% 
+      select(Year, Pay = col_name) %>%
+      group_by(Year) %>%
+      summarise(TotalPay = sum(Pay, na.rm = TRUE)) %>%
+      ggplot(mapping = aes(x = Year, y = TotalPay)) +
+      geom_col()
+    })
 }
 
 # Run the application 
