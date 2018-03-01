@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Q1 LA City Employee Payroll
 
-Link to my shiny app: 
+Link to my shiny app: <https://lumi-huang.shinyapps.io/hw3-shiny/>
 
 The `/home/m280-data/la_payroll/LA_City_Employee_Payroll.csv` file on teaching server contains payroll information of LA City employees in years 2013-2017. It was downloaded from [LA City Controller's Office](https://controllerdata.lacity.org/Payroll/City-Employee-Payroll/pazn-qyym). Make a Shiny app to facilitate exploratory data analysis. 
 
@@ -41,7 +41,8 @@ library("tidyverse")
 library("dbplyr")
 setwd(".")
 db <- dbConnect(RSQLite::SQLite(), dbname = 
-                  "/home/m280-data/la_parking/LA_Parking_Citations_Extra.sqlite")
+                  "/home/m280-data/la_parking/LA_Parking_Citations_Extra.sqlite"
+                )
 
 dbListTables(db)
 knitr::opts_chunk$set(connection = "db")
