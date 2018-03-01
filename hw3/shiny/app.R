@@ -9,10 +9,9 @@
 
 library(shiny)
 library(tidyverse)
-library(rsconnect)
 setwd(".")
 # LCEP <- read_rds("/home/luminghuang/biostat-m280-2018-winter/hw3/LCEP.rds")
-LCEP <- read_rds("../LCEP.rds")
+LCEP <- read_rds("LCEP.rds")
 
 LCEP$Base_Pay <- as.numeric(gsub('\\$', '', LCEP$`Base Pay`))
 LCEP$Overtime_Pay <- as.numeric(gsub('\\$', '', LCEP$`Overtime Pay`))
@@ -65,11 +64,15 @@ ui <- fluidPage(
     
     mainPanel(
       tabsetPanel(
-        tabPanel("Total payroll by LA City", plotOutput("TPLC")),
-        tabPanel("Who Earned Most?", tableOutput("WEM")),
-        tabPanel("Which Department Earned Most", textOutput("DEP"), tableOutput("WDEM")),
-        tabPanel("Which Departments Cost Most?", tableOutput("WDCM")),
-        tabPanel("Average Quarterly Payments", tableOutput("AQP"))
+        tabPanel("Total payroll by LA City", textOutput("select1"), 
+                 plotOutput("TPLC")),
+        tabPanel("Who Earned Most?", textOutput("select2"), tableOutput("WEM")),
+        tabPanel("Which Department Earned Most", textOutput("select3"), 
+                 tableOutput("WDEM")),
+        tabPanel("Which Departments Cost Most?", textOutput("select4"), 
+                 tableOutput("WDCM")),
+        tabPanel("Average Quarterly Payments", textOutput("select5"), 
+                 tableOutput("AQP"))
       )
       )
   )
@@ -78,6 +81,10 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   #Total payroll by LA City
+  
+  output$select1 <- renderText({
+    paste("You have selected: Pay type = ", input$pay)
+  })
   
   output$TPLC <- renderPlot({
     col_name <- switch(input$pay,
@@ -92,10 +99,9 @@ server <- function(input, output) {
       geom_col()
     })
   #Who earned most?
-  output$DEP <- renderText({ 
+  output$select2 <- renderText({ 
     paste("You have selected: ",
-          "Pay type = ", input$pay, "and",
-          "n = ", input$ndep)
+          "Year = ", input$year, "   ", "n = ", input$n)
   })
   output$WEM <- renderTable({
     LCEP %>%
@@ -106,6 +112,13 @@ server <- function(input, output) {
       arrange(desc(Total_Payments)) %>%
       top_n(input$n) %>%
       select(-Year)
+  })
+  
+  #which department earn most
+  output$select3 <- renderText({ 
+    paste("You have selected: ",
+          "Pay type = ", input$pay, "   ", "Method = ", input$method, "   ",
+          "Year = ", input$year, "   ", "Number of Department: ", input$ndep)
   })
 
 
@@ -128,8 +141,13 @@ server <- function(input, output) {
       arrange(desc(AveragePay)) %>%
       top_n(input$ndep)
   })
-  
+
   #Which Department Cost Most?
+  output$select4 <- renderText({ 
+    paste("You have selected: ",
+          "Year = ", input$year, "   Number of Department: ", input$ndep)
+  })
+  
   output$WDCM <- renderTable({
     LCEP %>%
       select(Year, `Department Title`, Total_Payments, Base_Pay, Overtime_Pay, 
@@ -146,6 +164,11 @@ server <- function(input, output) {
   
   #Visualize any other information you are interested in: 
   #average quarterly payments changes by year (select employment type $emptype)
+  output$select5 <- renderText({ 
+    paste("You have selected: ",
+          "Employment Type = ", input$emptype)
+  })
+  
   output$AQP <- renderTable({
     LCEP%>%
       select(Year, `Employment Type`, Q1_Payments, Q2_Payments, 
