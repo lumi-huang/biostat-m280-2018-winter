@@ -1,0 +1,279 @@
+---
+title: "Biostat M280 Homework 3"
+subtitle: Due Mar 2 @ 11:59PM
+output: html_document
+author: Lumi Huang
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Q1 LA City Employee Payroll
+
+Link to my shiny app: <https://lumi-huang.shinyapps.io/hw3-shiny/>
+
+The `/home/m280-data/la_payroll/LA_City_Employee_Payroll.csv` file on teaching server contains payroll information of LA City employees in years 2013-2017. It was downloaded from [LA City Controller's Office](https://controllerdata.lacity.org/Payroll/City-Employee-Payroll/pazn-qyym). Make a Shiny app to facilitate exploratory data analysis. 
+
+1. For efficiency of the Shiny app, you should first pre-process, pare down, tidy, and save the data, e.g., as a compressed RDS file, to be used in the app.
+
+0. **Total payroll by LA City**. Visualize the total LA City payroll of each year, with breakdown into base pay, overtime pay, and other pay.
+
+0. **Who earned most?** Visualize the payroll information (total payment with breakdown into base pay, overtime pay, and other pay, Department, Job Title) of the top $n$ highest paid LA City employees in a specific year. User specifies $n$ (default 10) and year (default 2017).
+
+0. **Which departments earn most?** Visualize the mean or median payroll, with breakdown into base pay, overtime pay, and other pay, of top $n$ earning departments. User specifies $n$ (default 5), year (default 2017), and method (mean or median, default median).
+
+0. **Which departments cost most?** Visualize the total payroll, with breakdown into base pay, overtime pay, and other pay, of top $n$ expensive departments. User specifies $n$ (default 5) and year (default 2017).
+
+0. Visualize any other information you are interested in.
+
+0. Publish your Shiny app to <https://www.shinyapps.io> and share the link.
+
+
+
+## Q2 LA City Parking War
+
+The SQLite database `/home/m280-data/la_parking/LA_Parking_Citations.sqlite` on teaching server contains information about parking tickets in LA City. It was downloaded from [LA Open Data Portal](https://data.lacity.org/A-Well-Run-City/Parking-Citations/wjz9-h9np). Connect to the database and answer following questions using plots and summary statistics. In this exercise, you are **not** allowed to load whole data into memory. Use the _transform in database, plot in R_ strategy.
+```{r}
+library("DBI")
+library("RSQLite")
+library("tidyverse")
+setwd(".")
+db <- dbConnect(RSQLite::SQLite(), dbname = 
+                  "/home/m280-data/la_parking/LA_Parking_Citations_Extra.sqlite"
+                )
+
+dbListTables(db)
+knitr::opts_chunk$set(connection = "db")
+
+latix_sql <- dplyr::tbl(db, "latix")
+str(latix_sql)
+latix_sql %>% print(width = Inf)
+
+```
+
+
+
+1. How many tickets are in this data set?  
+```{r}
+latix_sql %>%
+  count()
+```
+
+
+```{sql connection="db"}
+select count(*) from latix;
+
+```
+Which time period do these tickets span?
+Time span from 2010/04/28 to 2017/12/30.
+```{r}
+time_period <- latix_sql %>%
+  select(Issue_Year, Issue_Month, Issue_Day) %>%
+  group_by(Issue_Year, Issue_Month, Issue_Day) %>%
+  distinct() %>%
+  arrange(Issue_Year, Issue_Month, Issue_Day)
+
+time_period1 <- head(time_period)
+time_period1
+
+time_period2 <- latix_sql %>%
+  select(Issue_Year, Issue_Month, Issue_Day) %>%
+  group_by(Issue_Year, Issue_Month, Issue_Day) %>%
+  distinct() %>%
+  arrange(desc(Issue_Year), desc(Issue_Month), desc(Issue_Day))
+
+time_period3 <- head(time_period2)
+time_period3
+
+
+```
+
+
+```{sql connection="db"}
+select min(Issue_Year), max(Issue_Year) from latix;
+```
+```{sql connection="db"}
+select min(Issue_Month) from latix
+where Issue_Year = '2010';
+
+```
+```{sql connection="db"}
+select min(Issue_Day) from latix
+where Issue_Year = '2010' and Issue_Month = '4';
+```
+```{sql connection="db"}
+select max(Issue_Month) from latix
+where Issue_Year = '2017';
+
+```
+
+```{sql connection="db"}
+select max(Issue_Day) from latix
+where Issue_Year = '2017' and Issue_Month = '12';
+```
+tickets span from 2010/04/27 to 2017/12/30
+
+Which years have most data?
+```{r}
+latix_sql %>%
+  select(Issue_Year) %>%
+  group_by(Issue_Year) %>%
+  count() %>%
+  arrange(desc(n))
+```
+
+
+```{sql connection="db"}
+select Issue_Year, count(*) from latix
+group by Issue_Year
+order by count(*) desc;
+```
+2015 has most data
+
+
+0. When (which hour, weekday, month day, and month) are you most likely to get a ticket and when are you least likely to get a ticket?
+```{r}
+#Most likely
+#month
+latix_sql %>%
+  select(Issue_Month) %>%
+  group_by(Issue_Month) %>%
+  count() %>%
+  arrange(desc(n))
+#day
+latix_sql %>%
+  select(Issue_Day) %>%
+  group_by(Issue_Day) %>%
+  count() %>%
+  arrange(desc(n))
+#Weekday
+latix_sql %>%
+  select(Issue_Wday) %>%
+  group_by(Issue_Wday) %>%
+  count() %>%
+  arrange(desc(n))
+
+#Hour
+latix_sql %>%
+  select(Issue_Hour) %>%
+  group_by(Issue_Hour) %>%
+  count() %>%
+  arrange(desc(n))
+
+#Least Likely
+#Month
+latix_sql %>%
+  select(Issue_Month) %>%
+  group_by(Issue_Month) %>%
+  count() %>%
+  arrange(n)
+#day
+latix_sql %>%
+  select(Issue_Day) %>%
+  group_by(Issue_Day) %>%
+  count() %>%
+  arrange(n)
+#Weekday
+latix_sql %>%
+  select(Issue_Wday) %>%
+  group_by(Issue_Wday) %>%
+  count() %>%
+  arrange(n)
+
+#Hour
+latix_sql %>%
+  select(Issue_Hour) %>%
+  group_by(Issue_Hour) %>%
+  count() %>%
+  arrange(n)
+  
+```
+Most Likely:
+Month: 3
+Day: 22
+Weekday: Wed
+Hour: 12pm
+
+Least Likely:
+Month: 11
+Day: 31
+Weekday: Sun
+Hour: 5
+
+
+
+0. Which car makes received most citations?
+
+```{r}
+latix_sql %>%
+  select(Make) %>%
+  group_by(Make) %>%
+  count() %>%
+  arrange(desc(n))
+```
+
+
+```{sql connection="db"}
+select make, count(*) from latix
+group by make
+order by count(*) desc
+limit 5;
+```
+
+Toyota
+
+0. How many different colors of cars were ticketed? Which color attracted most tickets?
+```{r}
+latix_sql %>% 
+  select(Color) %>%
+  distinct() %>%
+  count()
+
+latix_sql %>%
+  select(Color) %>%
+  group_by(Color) %>%
+  count() %>%
+  arrange(desc(n))
+
+```
+
+
+
+There are 66 different colors of cars were ticketed, and color Black attracted most tickets.
+
+0. What are the most common ticket types?
+```{r}
+latix_sql %>%
+  select(Violation_Description) %>%
+  group_by(Violation_Description) %>%
+  count() %>%
+  arrange(desc(n))
+```
+NO PARK/STREET CLEAN is the most common ticket types.
+
+0. How much money was collected on parking tickets in 2015 and 2016?
+```{r}
+latix_sql %>%
+  select(Issue_Year, Fine_amount) %>%
+  filter(Issue_Year == "2015" | Issue_Year == "2016") %>%
+  group_by(Issue_Year) %>%
+  summarise(Total_Fine = sum(Fine_amount, na.rm = TRUE)) %>%
+  arrange(desc(Total_Fine))
+```
+
+In 2015, 151006794 usd was collected. In 2016, 123236136 usd was collected.
+
+0. Visualize any other information you are interested in.
+Which location collect the most money in 2015
+```{r}
+latix_sql %>%
+  select(Issue_Year, Location, Fine_amount) %>%
+  filter(Issue_Year == "2015") %>%
+  group_by(Location) %>%
+  summarise(Total_Fine = sum(Fine_amount, na.rm = TRUE)) %>%
+  arrange(desc(Total_Fine))
+```
+
+
+11600 SAN VICENTE BL collected the most money in 2015
