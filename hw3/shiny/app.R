@@ -10,7 +10,8 @@
 library(shiny)
 library(tidyverse)
 setwd(".")
-LCEP <- read_rds("/home/luminghuang/biostat-m280-2018-winter/hw3/LCEP.rds")
+# LCEP <- read_rds("/home/luminghuang/biostat-m280-2018-winter/hw3/LCEP.rds")
+LCEP <- read_rds("../LCEP.rds")
 
 LCEP$Base_Pay <- as.numeric(gsub('\\$', '', LCEP$`Base Pay`))
 LCEP$Overtime_Pay <- as.numeric(gsub('\\$', '', LCEP$`Overtime Pay`))
