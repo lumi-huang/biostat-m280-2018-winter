@@ -63,16 +63,13 @@ ui <- fluidPage(
     ),
     
     mainPanel(
-      h3(helpText("Total payroll by LA City")),
-      plotOutput("TPLC"),
-      h3(helpText("Who Earned Most?")),
-      tableOutput("WEM"),
-      h3(textOutput("DEP")),
-      tableOutput("WDEM"),
-      h3(helpText("Which Departments Cost Most?")),
-      tableOutput("WDCM"),
-      h3(helpText("Average Quarterly Payments")),
-      tableOutput("AQP")
+      tabsetPanel(
+        tabPanel("Total payroll by LA City", plotOutput("TPLC")),
+        tabPanel("Who Earned Most?", tableOutput("WEM")),
+        tabPanel("Which Department Earned Most", textOutput("DEP"), tableOutput("WDEM")),
+        tabPanel("Which Departments Cost Most?", tableOutput("WDCM")),
+        tabPanel("Average Quarterly Payments", tableOutput("AQP"))
+      )
       )
   )
 )
@@ -94,6 +91,11 @@ server <- function(input, output) {
       geom_col()
     })
   #Who earned most?
+  output$DEP <- renderText({ 
+    paste("You have selected: ",
+          "Pay type = ", input$pay, "and",
+          "n = ", input$ndep)
+  })
   output$WEM <- renderTable({
     LCEP %>%
       select(`Row ID`, Year, `Department Title`, `Job Class Title`, 
@@ -104,13 +106,7 @@ server <- function(input, output) {
       top_n(input$n) %>%
       select(-Year)
   })
-  #Which Department Earn Most?
-  output$DEP <- renderText({ 
-    paste("Which Departments Earn Most?", 
-          "You have selected: ",
-          "Pay type = ", input$pay, "and",
-          "n = ", input$ndep)
-  })
+
 
   output$WDEM <- renderTable({
     col_name <- switch(input$pay,
