@@ -9,6 +9,7 @@
 
 library(shiny)
 library(tidyverse)
+library(rsconnect)
 setwd(".")
 # LCEP <- read_rds("/home/luminghuang/biostat-m280-2018-winter/hw3/LCEP.rds")
 LCEP <- read_rds("../LCEP.rds")
