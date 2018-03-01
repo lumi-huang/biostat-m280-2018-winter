@@ -275,6 +275,15 @@ Most likely hour: 12pm, Least likely hour: 5am
 
 0. Which car makes received most citations?
 
+```{r}
+latix_sql%>%
+  select(Make) %>%
+  group_by(Make) %>%
+  count() %>%
+  arrange(desc(n))
+```
+
+
 ```{sql connection="db"}
 select make, count(*) from latix
 group by make
