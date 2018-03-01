@@ -38,7 +38,6 @@ The SQLite database `/home/m280-data/la_parking/LA_Parking_Citations.sqlite` on 
 library("DBI")
 library("RSQLite")
 library("tidyverse")
-library("dbplyr")
 setwd(".")
 db <- dbConnect(RSQLite::SQLite(), dbname = 
                   "/home/m280-data/la_parking/LA_Parking_Citations_Extra.sqlite"
