@@ -95,19 +95,86 @@ order by count(*) desc;
 
 0. When (which hour, weekday, month day, and month) are you most likely to get a ticket and when are you least likely to get a ticket?
 ```{sql connection="db"}
-select Issue_Month, Issue_Day, Issue_Hour, count(*) from latix
-group by Issue_Month, Issue_Day, Issue_Hour
+select Issue_Month, Issue_Day, Issue_Wday, Issue_Hour, count(*) from latix
+group by Issue_Month, Issue_Day, Issue_Wday, Issue_Hour
 order by count(*) desc
 limit 5;
 ```
 ```{sql connection="db"}
-select Issue_Month, Issue_Day, Issue_Hour, count(*) from latix
-group by Issue_Month, Issue_Day, Issue_Hour
+select Issue_Month, Issue_Day, Issue_Wday, Issue_Hour, count(*) from latix
+group by Issue_Month, Issue_Day, Issue_Wday, Issue_Hour
 order by count(*)
 limit 5;
 ```
+Combined: Most likely on January 2nd (Sat) at 8am / Least likely on January 1st (Thu) 13pm (ties).
+
+```{sql connection="db"}
+select Issue_Month, count(*) from latix
+group by Issue_Month
+order by count(*) desc
+limit 2;
+```
+```{sql connection="db"}
+select Issue_Month, count(*) from latix
+group by Issue_Month
+order by count(*)
+limit 2;
+```
+Most likely month: March, Least likely month: November
+
+```{sql connection="db"}
+select Issue_Day, count(*) from latix
+group by Issue_Day
+order by count(*) desc
+limit 2;
+```
+
+```{sql connection="db"}
+select Issue_Day, count(*) from latix
+group by Issue_Day
+order by count(*)
+limit 2;
+```
+Most likely day: 22, Least likely day: 31
+
+```{sql connection="db"}
+select Issue_Wday, count(*) from latix
+group by Issue_Wday
+order by count(*) desc
+limit 2;
+```
+```{sql connection="db"}
+select Issue_Wday, count(*) from latix
+group by Issue_Wday
+order by count(*)
+limit 2;
+```
+Most likely weekday: Wed, Least likely weekday: Sunday
+
+```{sql connection="db"}
+select Issue_Hour, count(*) from latix
+group by Issue_Hour
+order by count(*) desc
+limit 2;
+```
+```{sql connection="db"}
+select Issue_Hour, count(*) from latix
+group by Issue_Hour
+order by count(*)
+limit 2;
+```
+Most likely hour: 12pm, Least likely hour: 5am
 
 0. Which car makes received most citations?
+
+```{sql connection="db"}
+select make, count(*) from latix
+group by make
+order by count(*) desc
+limit 5;
+```
+
+Toyota
 
 0. How many different colors of cars were ticketed? Which color attracted most tickets?
 
