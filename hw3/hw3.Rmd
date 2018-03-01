@@ -182,18 +182,40 @@ select count(distinct(color)) from latix;
 ```
 
 ```{sql connection="db"}
-select color, count(*) from latix;
-group by color
+select Color, count(*) from latix;
+group by Color
 order by count(*) desc;
 ```
 There are 65 different colors of cars were ticketed, and color SL attracted most tickets.
 
 0. What are the most common ticket types?
 ```{sql connection="db"}
+select Violation_Description, count(*) from latix
+group by Violation_Description
+order by count(*) desc
+limit 5;
+```
+NO PARK/STREET CLEAN is the most common ticket types.
+
+0. How much money was collected on parking tickets in 2015 and 2016?
+```{sql connection="db"}
+select Issue_Year, sum(Fine_Amount) as Total_Fine from latix
+where Issue_Year = '2015' or Issue_Year = '2016'
+group by Issue_Year
+order by Total_Fine desc
+limit 5;
 
 ```
 
-
-0. How much money was collected on parking tickets in 2015 and 2016?
+In 2015, 151006794 usd was collected. In 2016, 123236136 usd was collected.
 
 0. Visualize any other information you are interested in.
+Which location collect the most money in 2015
+```{sql connection="db"}
+select Issue_Year, Location, sum(Fine_Amount) as Total_Fine from latix
+where Issue_Year = '2015'
+group by Location
+order by Total_Fine desc
+limit 5;
+```
+11600 SAN VICENTE BL collected the most money in 2015
