@@ -119,8 +119,10 @@ Which years have most data?
 latix_sql %>%
   select(Issue_Year) %>%
   group_by(Issue_Year) %>%
-  count() %>%
-  arrange(desc(n))
+  filter(!is.na(Issue_Year)) %>%
+  collect() %>%
+  ggplot(mapping = aes(x = Issue_Year)) +
+  geom_bar()
 ```
 
 
@@ -134,60 +136,39 @@ order by count(*) desc;
 
 0. When (which hour, weekday, month day, and month) are you most likely to get a ticket and when are you least likely to get a ticket?
 ```{r}
-#Most likely
 #month
 latix_sql %>%
   select(Issue_Month) %>%
   group_by(Issue_Month) %>%
   count() %>%
-  arrange(desc(n))
+  collect() %>%
+  ggplot(mapping = aes(x = Issue_Month, y = n)) +
+  geom_col()
 #day
 latix_sql %>%
   select(Issue_Day) %>%
   group_by(Issue_Day) %>%
   count() %>%
-  arrange(desc(n))
+  collect() %>%
+  ggplot(mapping = aes(x = Issue_Day, y = n)) +
+  geom_col()
 #Weekday
 latix_sql %>%
   select(Issue_Wday) %>%
   group_by(Issue_Wday) %>%
   count() %>%
-  arrange(desc(n))
+  collect() %>%
+  ggplot(mapping = aes(x = Issue_Wday, y = n)) +
+  geom_col()
 
 #Hour
 latix_sql %>%
   select(Issue_Hour) %>%
   group_by(Issue_Hour) %>%
   count() %>%
-  arrange(desc(n))
-
-#Least Likely
-#Month
-latix_sql %>%
-  select(Issue_Month) %>%
-  group_by(Issue_Month) %>%
-  count() %>%
-  arrange(n)
-#day
-latix_sql %>%
-  select(Issue_Day) %>%
-  group_by(Issue_Day) %>%
-  count() %>%
-  arrange(n)
-#Weekday
-latix_sql %>%
-  select(Issue_Wday) %>%
-  group_by(Issue_Wday) %>%
-  count() %>%
-  arrange(n)
-
-#Hour
-latix_sql %>%
-  select(Issue_Hour) %>%
-  group_by(Issue_Hour) %>%
-  count() %>%
-  arrange(n)
-  
+  collect() %>%
+  ggplot(mapping = aes(x = Issue_Hour, y = n)) +
+  geom_col()
 ```
 Most Likely:
 Month: 3
@@ -199,18 +180,22 @@ Least Likely:
 Month: 11
 Day: 31
 Weekday: Sun
-Hour: 5
+Hour: 5am
 
 
 
 0. Which car makes received most citations?
 
 ```{r}
-latix_sql %>%
+car_make <- latix_sql %>%
   select(Make) %>%
   group_by(Make) %>%
   count() %>%
-  arrange(desc(n))
+  arrange(desc(n)) %>%
+  collect()
+car_make_h <- head(car_make)
+
+car_make_h
 ```
 
 
@@ -228,13 +213,16 @@ Toyota
 latix_sql %>% 
   select(Color) %>%
   distinct() %>%
-  count()
+  count() %>%
+  collect()
 
-latix_sql %>%
+CAMT <- latix_sql %>%
   select(Color) %>%
   group_by(Color) %>%
   count() %>%
-  arrange(desc(n))
+  arrange(desc(n)) %>%
+  collect()
+head(CAMT)
 
 ```
 
@@ -244,11 +232,12 @@ There are 66 different colors of cars were ticketed, and color Black attracted m
 
 0. What are the most common ticket types?
 ```{r}
-latix_sql %>%
+MCT <- latix_sql %>%
   select(Violation_Description) %>%
   group_by(Violation_Description) %>%
   count() %>%
   arrange(desc(n))
+head(MCT)
 ```
 NO PARK/STREET CLEAN is the most common ticket types.
 
@@ -267,12 +256,13 @@ In 2015, 151006794 usd was collected. In 2016, 123236136 usd was collected.
 0. Visualize any other information you are interested in.
 Which location collect the most money in 2015
 ```{r}
-latix_sql %>%
+Location <- latix_sql %>%
   select(Issue_Year, Location, Fine_amount) %>%
   filter(Issue_Year == "2015") %>%
   group_by(Location) %>%
   summarise(Total_Fine = sum(Fine_amount, na.rm = TRUE)) %>%
   arrange(desc(Total_Fine))
+head(Location)
 ```
 
 
