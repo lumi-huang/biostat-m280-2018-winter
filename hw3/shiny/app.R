@@ -33,8 +33,9 @@ ui <- fluidPage(
     sidebarPanel(
       selectInput("pay",
                   label = "Choose a pay type",
-                  choices = c("Base Pay", "Overtime Pay", "Other Pay"),
-                  selected = "Base Pay"),
+                  choices = c("Total Pay", "Base Pay", 
+                              "Overtime Pay", "Other Pay"),
+                  selected = "Total Payments"),
       #top n highest pay
       sliderInput("n",
                   label = "Choose number of highest paid employees",
@@ -88,6 +89,7 @@ server <- function(input, output) {
   
   output$TPLC <- renderPlot({
     col_name <- switch(input$pay,
+                       "Total Pay" = "Total_Payments",
                        "Base Pay" = "Base_Pay",
                        "Overtime Pay" = "Overtime_Pay",
                        "Other Pay" = "Other_Pay_Payroll_Explorer")
@@ -124,6 +126,7 @@ server <- function(input, output) {
 
   output$WDEM <- renderTable({
     col_name <- switch(input$pay,
+                       "Total Pay" = "Total_Payments",
                        "Base Pay" = "Base_Pay",
                        "Overtime Pay" = "Overtime_Pay",
                        "Other Pay" = "Other_Pay_Payroll_Explorer")
