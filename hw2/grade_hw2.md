@@ -50,7 +50,7 @@
 
 -   Are the materials (files and instructions) submitted to the `master` branch sufficient for reproducing all the results? (-2 pts)
 
-    Note that the path `"/home/luminghuang/biostat-m280-2018-winter/hw2/md_bim.txt"` is for your account on the server.
+    Note that the path `"/home/luminghuang/biostat-m280-2018-winter/hw2/md_bim.txt"` is for your account on the server. Make sure that your collaborators can easily run your code.
 
 -   If necessary, are there clear instructions, either in report or in a separate file, how to reproduce the results?
 
