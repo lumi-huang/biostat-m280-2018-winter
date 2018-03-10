@@ -6,6 +6,7 @@ author: Lumi Huang
 ---
 
 ```{r setup, include=FALSE}
+setwd(".")
 knitr::opts_chunk$set(echo = TRUE)
 library(sparklyr)
 library(dplyr)
@@ -21,17 +22,24 @@ sc
 ```
 
 ```{r}
-flights_tbl <- tbl(sc, 'flights')
+#flights_tbl <- tbl(sc, 'flights')
+#saveRDS(flights_tbl, file = "flight_tbl.rds")
+flight_tbl <- read_rds("flight_tbl.rds")
 flights_tbl %>% print(width = Inf)
 
 ```
+
 ```{r}
-airlines_tbl <- tbl(sc, 'airlines')
+#airlines_tbl <- tbl(sc, 'airlines')
+#saveRDS(airlins_tbl, file = "airlines_tbl.rds")
+airlines_tbl <- read_rds("airlines_tbl.rds")
 airlines_tbl %>% print(width = Inf)
 ```
 
 ```{r}
-airports_tbl <- tbl(sc, 'airports')
+#airports_tbl <- tbl(sc, 'airports')
+#saveRDS(airports_tbl, "airports_tbl.rds")
+airports_tbl <- read_rds("airports_tbl.rds")
 airports_tbl %>% print(width = Inf)
 ```
 
