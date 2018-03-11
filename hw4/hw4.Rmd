@@ -65,23 +65,36 @@ top_dest <- flights_tbl %>%
   count() %>%
   arrange(desc(n)) %>%
   collect()
-top_dest
-#combine data set
-airports_tbl1 <- rename(airports_tbl, dest = faa)
-head(airports_tbl1)
-top_dest1 <- dplyr::inner_join(top_dest, airports_tbl1, by = "dest", copy = TRUE)
-head(top_dest1)
 
-top_dest2 <- top_dest1 %>%
+top_origin <- flights_tbl %>%
+  group_by(origin) %>%
+  count() %>%
+  arrange(desc(n)) %>%
+  collect()
+
+top_origin
+top_dest
+#sum up origin + dest
+top_airports <- full_join(top_dest, top_origin, 
+                          by = c("dest" = "origin"), copy = TRUE)
+top_airports$n <- top_airports$n.x + top_airports$n.y
+
+#combine data set
+
+top_airports1 <- dplyr::inner_join(top_airports, airports_tbl, 
+                               by = c("dest" = "faa"), copy = TRUE)
+head(top_airports1)
+
+top_airports2 <- top_airports1 %>%
   select(dest, lat, lon, n)
-top_dest2
-top_10 <- as.data.frame(head(top_dest2, 10), stringAsFactors = FALSE)
+top_airports2
+top_10 <- as.data.frame(head(top_airports2, 10), stringAsFactors = FALSE)
 top_10$lat <- as.numeric(top_10$lat)
 top_10$lon <- as.numeric(top_10$lon)
 top_10$n <- as.numeric(top_10$n / 1000000)
 top_10$n <- round(top_10$n)
 
-
+top_10
 base_map + 
   geom_point(data = top_10, aes(x = lon, y = lat), colour = "yellow", 
              size = top_10$n) +
@@ -146,12 +159,28 @@ base_map +
     </p>
 
     (a). Reproduce above plot. Visualize and explain some prominent features you observe. For example, what happened at points 1-5?
+```{r}
+LAX_AT <- 
+```
+    
 
     (b). Visualize and explain seasonal effects.
+```{r}
+
+```
+    
   
     (c). Visualize and explain weekly effects.
+```{r}
+
+```
+    
   
     (d). Map top 10 destinations from LAX. Size of dots should reflect the number of flights from LAX to that destination.
+```{r}
+
+```
+    
     
 0. Build a predictive model for the arrival delay (`arrdelay`) of flights flying from LAX. Use the same filtering criteria as in the [lecture notes](http://hua-zhou.github.io/teaching/biostatm280-2018winter/slides/12-sparklyr/sparklyr-flights.html) to construct training and validation sets. You are allowed to use a maximum of 5 predictors. The prediction performance of your model on the validation data set will be an important factor for grading this question.
     
