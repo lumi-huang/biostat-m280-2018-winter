@@ -53,12 +53,11 @@ Hint: You may find this tutorial on [Making Maps in R](http://eriqande.github.io
 
 ```{r}
 usa <- map_data("usa")
-head(usa)
-dim(usa)
+#head(usa)
+#dim(usa)
 
 base_map <- ggplot() + 
   geom_polygon(data = usa, aes(x=long, y = lat, group = group), fill = "gray")
-base_map
 ```
 ```{r}
 top_dest <- flights_tbl %>%
@@ -79,7 +78,7 @@ top_dest2
 top_10 <- as.data.frame(head(top_dest2, 10), stringAsFactors = FALSE)
 top_10$lat <- as.numeric(top_10$lat)
 top_10$lon <- as.numeric(top_10$lon)
-top_10$n <- as.numeric(top_10$n/1000000)
+top_10$n <- as.numeric(top_10$n / 1000000)
 top_10$n <- round(top_10$n)
 
 
@@ -96,6 +95,46 @@ base_map +
 
 0. Map the top 10 busiest direct routes. Size of lines should reflect the number of flights through that route.
 ```{r}
+top_droute <- flights_tbl %>%
+  group_by(origin, dest) %>%
+  count() %>%
+  arrange(desc(n)) %>%
+  collect()
+top_droute
+#combine data set
+
+top_10_route <- as.data.frame(head(top_droute, 10), stringAsFactors = FALSE)
+top_10_route
+
+#combine dataset by origin=faa to get lat and lon
+top_10_route1 <- inner_join(top_10_route, airports_tbl, 
+                            by = c("origin" = "faa"), copy = TRUE) %>%
+  rename(lat1 = lat, lon1 = lon)
+top_10_route1 <- inner_join(top_10_route1, airports_tbl,
+                            by = c("dest" = "faa"), copy = TRUE) %>%
+  rename(lat2 = lat, lon2 = lon)
+top_10_route2 <- top_10_route1 %>%
+  select(origin, dest, lat1, lat2, lon1, lon2, n)
+top_10_route2$lat1 <- as.numeric(top_10_route2$lat1)
+top_10_route2$lat2 <- as.numeric(top_10_route2$lat2)
+top_10_route2$lon1 <- as.numeric(top_10_route2$lon1)
+top_10_route2$lon2 <- as.numeric(top_10_route2$lon2)
+top_10_route2$n <- as.numeric(top_10_route2$n)
+top_10_route2$size <- round(top_10_route2$n / 100000)
+
+
+base_map + 
+  geom_curve(data = top_10_route2, 
+             aes(x = lon1, y = lat1, xend = lon2, yend = lat2),
+             arrow = arrow(length = unit(0.01, "npc")),
+             size = top_10_route2$size, color = "red") +
+  geom_point(data = top_10_route2, aes(x = lon1, y = lat1), colour = "black") +
+  geom_point(data = top_10_route2, aes(x = lon2, y = lat2), colour = "black") +
+  geom_text(data = top_10_route2, 
+            aes(x = lon1, y = lat1, label = 
+                  paste(" ", as.character(origin), sep = "")), angle = 0, 
+            hjust = 0, color = "black")
+
 
 ```
 
