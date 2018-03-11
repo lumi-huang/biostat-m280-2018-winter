@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(sparklyr)
 library(devtools)
 library(dplyr)
+#library(tidyverse)
 library(ggplot2)
 library(ggmap)
 library(stringr)
@@ -20,27 +21,29 @@ Sys.setenv(SPARK_HOME="/usr/lib/spark")
 config <- spark_config()
 sc <- spark_connect(master = "yarn-client", config = config)
 sc
+
+
 ```
 
 ```{r}
-#flights_tbl <- tbl(sc, 'flights')
+flights_tbl <- tbl(sc, 'flights')
 #saveRDS(flights_tbl, file = "flight_tbl.rds")
-flight_tbl <- read_rds("flight_tbl.rds")
+#flights_tbl <- read_rds("flight_tbl.rds")
 flights_tbl %>% print(width = Inf)
 
 ```
 
 ```{r}
-#airlines_tbl <- tbl(sc, 'airlines')
+airlines_tbl <- tbl(sc, 'airlines')
 #saveRDS(airlins_tbl, file = "airlines_tbl.rds")
-airlines_tbl <- read_rds("airlines_tbl.rds")
+#airlines_tbl <- read_rds("airlines_tbl.rds")
 airlines_tbl %>% print(width = Inf)
 ```
 
 ```{r}
-#airports_tbl <- tbl(sc, 'airports')
+airports_tbl <- tbl(sc, 'airports')
 #saveRDS(airports_tbl, "airports_tbl.rds")
-airports_tbl <- read_rds("airports_tbl.rds")
+#airports_tbl <- read_rds("airports_tbl.rds")
 airports_tbl %>% print(width = Inf)
 ```
 
@@ -59,6 +62,7 @@ usa <- map_data("usa")
 base_map <- ggplot() + 
   geom_polygon(data = usa, aes(x=long, y = lat, group = group), fill = "gray")
 ```
+
 ```{r}
 top_dest <- flights_tbl %>%
   group_by(dest) %>%
@@ -72,8 +76,8 @@ top_origin <- flights_tbl %>%
   arrange(desc(n)) %>%
   collect()
 
-top_origin
-top_dest
+#top_origin
+#top_dest
 #sum up origin + dest
 top_airports <- full_join(top_dest, top_origin, 
                           by = c("dest" = "origin"), copy = TRUE)
@@ -160,13 +164,36 @@ base_map +
 
     (a). Reproduce above plot. Visualize and explain some prominent features you observe. For example, what happened at points 1-5?
 ```{r}
-LAX_AT <- 
+LAX_AT <- flights_tbl %>%
+  filter(dest == "LAX" | origin == "LAX") %>%
+  select(year, month, dayofmonth, dayofweek)
+
+LAX_air_traffic <- LAX_AT %>%
+  select(year, month, dayofmonth) %>%
+  group_by(year, month, dayofmonth) %>%
+  count() %>%
+  arrange(year, month, dayofmonth) %>%
+  collect()
+  
+#head(LAX_air_traffic)
+
+LAX_air_traffic1 <- LAX_air_traffic %>%
+  mutate(date = paste(year, month, dayofmonth, sep = "-"))
+head(LAX_air_traffic1)
+LAX_air_traffic1$date <- as.Date(LAX_air_traffic1$date, format = "%Y-%m-%d")
+head(LAX_air_traffic1)
+
+LAX_air_traffic1 %>%
+  ggplot(aes(x = date, y = n)) + 
+  geom_path() +
+  scale_x_date()
+
 ```
     
 
     (b). Visualize and explain seasonal effects.
 ```{r}
-
+seasonal_effect
 ```
     
   
