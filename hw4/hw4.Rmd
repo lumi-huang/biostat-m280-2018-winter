@@ -199,19 +199,70 @@ At point 5, there was a drastic increase in LA air traffic.
 
     (b). Visualize and explain seasonal effects.
 ```{r}
-seasonal_effect
+seasonal_effect <- LAX_AT %>%
+  filter(year >= 1998 & year < 2009) %>%
+  select(year, month) %>%
+  group_by(year, month) %>%
+  count() %>%
+  arrange(year, month) %>%
+  collect()
+
+seasonal_effect %>%
+  group_by(month) %>%
+  summarise(avg = mean(n, na.rm = TRUE)) %>%
+  ggplot() +
+  geom_col(aes(x = month, y = avg))
 ```
-    
+
+Based on average air traffic from year 1998 to year 2008, we can see that FEB is less busier than other months while July and August are busier than other months.
   
     (c). Visualize and explain weekly effects.
 ```{r}
+head(LAX_AT)
+weekly_effect <- LAX_AT %>%
+  filter(year == 2008) %>%
+  select(dayofweek) %>%
+  group_by(dayofweek) %>%
+  count() %>%
+  arrange(dayofweek) %>%
+  collect()
+weekly_effect %>%
+  ggplot() +
+  geom_col(aes(x = dayofweek, y = n))
 
 ```
     
+
+In 2008, LAX has the lowest average air traffic on Sat while weekdays have about the same air traffic.
   
     (d). Map top 10 destinations from LAX. Size of dots should reflect the number of flights from LAX to that destination.
 ```{r}
+top_lax <- flights_tbl %>%
+  filter(origin == "LAX" & year == "2008") %>%
+  select(dest) %>%
+  group_by(dest) %>%
+  count() %>% 
+  arrange(desc(n))
+top_lax
+top_10_lax <- as.data.frame(head(top_lax, 10))
+top_10_lax1 <- top_10_lax %>% 
+  left_join(airports_tbl, by = c("dest" = "faa"), copy = TRUE) %>%
+  select(dest, lat, lon, n)
+top_10_lax1$lat <- as.numeric(top_10_lax1$lat)
+top_10_lax1$lon <- as.numeric(top_10_lax1$lon)
+top_10_lax1$n <- as.numeric(top_10_lax1$n)
+top_10_lax1$size <- round(top_10_lax1$n / 1000)
 
+top_10_lax1
+
+base_map + 
+  geom_point(data = top_10_lax1, aes(x = lon, y = lat), color = "yellow",
+             size = top_10_lax1$size, alpha = 0.5) +
+  geom_text(data = top_10_lax1, 
+            aes(x = lon, y = lat, label = 
+                  paste(" ", as.character(dest), sep = "")), angle = 0, 
+            hjust = 0, color = "black", size = 2) +
+  coord_fixed(1.3) 
 ```
     
     
@@ -219,3 +270,12 @@ seasonal_effect
     
 0. Visualize and explain any other information you want to explore.
   
+```{r}
+
+```
+
+```{r}
+spark_disconnect_all()
+```
+
+
