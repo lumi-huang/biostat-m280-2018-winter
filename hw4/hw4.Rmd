@@ -178,10 +178,11 @@ LAX_air_traffic <- LAX_AT %>%
 #head(LAX_air_traffic)
 
 LAX_air_traffic1 <- LAX_air_traffic %>%
+  filter(year >= 1998 & year < 2009) %>%
   mutate(date = paste(year, month, dayofmonth, sep = "-"))
-head(LAX_air_traffic1)
+#head(LAX_air_traffic1)
 LAX_air_traffic1$date <- as.Date(LAX_air_traffic1$date, format = "%Y-%m-%d")
-head(LAX_air_traffic1)
+#head(LAX_air_traffic1)
 
 LAX_air_traffic1 %>%
   ggplot(aes(x = date, y = n)) + 
@@ -190,6 +191,11 @@ LAX_air_traffic1 %>%
 
 ```
     
+At point 1, there was a drastic decrease in LA air traffic. 
+At point 2, LA air traffic was stable.
+At point 3, there was a small increase in LA air traffic, and the air traffic varied within a small range around point 3.
+At point 4, in 2008, there was a drastic decrease in LA air traffic.
+At point 5, there was a drastic increase in LA air traffic.
 
     (b). Visualize and explain seasonal effects.
 ```{r}
