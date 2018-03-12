@@ -271,7 +271,38 @@ base_map +
 0. Visualize and explain any other information you want to explore.
   
 ```{r}
+#fit a linear reg model of arrdelay on distance, carriers, month, dest, origin
+model_data <- flights_tbl %>%
+  filter(!is.na(arrdelay) & !is.na(depdelay) & !is.na(distance)) %>%
+  filter(depdelay > 15 & depdelay < 240) %>%
+  filter(arrdelay > -60 & arrdelay < 360) %>%
+  filter(year >= 2003 & year <= 2007) %>%
+  left_join(airlines_tbl, by = c("uniquecarrier" = "code")) %>%
+  filter(!is.na(uniquecarrier)) %>%
+  select(year, month, distance, uniquecarrier, description, 
+         dest, origin, arrdelay)
 
+#head(model_data)
+
+#summarize data by carrier, month, dest, origin
+model_data %>%
+  group_by(uniquecarrier, month, dest, origin) %>%
+  summarize(description = min(description, na.rm = TRUE), 
+            distance = mean(distance, na.rm = TRUE),
+            arrdelay = mean(arrdelay, na.rm = TRUE)) %>%
+  select(uniquecarrier, description, distance, month, dest, origin, arrdelay) %>%
+  arrange(arrdelay)
+
+#partition the data into training and validation sets
+model_partition <- model_data %>%
+  sdf_partition(train = 0.8, valid = 0.2, seed = 5555)
+#fit a linear model
+model1 <- model_partition$train %>%
+  ml_linear_regression(arrdelay ~ 
+                         distance + uniquecarrier + month + dest + origin)
+
+#summarize the linear model
+summary(model1)
 ```
 
 ```{r}
