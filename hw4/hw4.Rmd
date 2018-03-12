@@ -268,7 +268,6 @@ base_map +
     
 0. Build a predictive model for the arrival delay (`arrdelay`) of flights flying from LAX. Use the same filtering criteria as in the [lecture notes](http://hua-zhou.github.io/teaching/biostatm280-2018winter/slides/12-sparklyr/sparklyr-flights.html) to construct training and validation sets. You are allowed to use a maximum of 5 predictors. The prediction performance of your model on the validation data set will be an important factor for grading this question.
     
-0. Visualize and explain any other information you want to explore.
   
 ```{r}
 #fit a linear reg model of arrdelay on distance, carriers, month, dest, origin
@@ -297,13 +296,52 @@ model_data %>%
 model_partition <- model_data %>%
   sdf_partition(train = 0.8, valid = 0.2, seed = 5555)
 #fit a linear model
-model1 <- model_partition$train %>%
+system.time(
+  model1 <- model_partition$train %>%
   ml_linear_regression(arrdelay ~ 
                          distance + uniquecarrier + month + dest + origin)
+)
 
 #summarize the linear model
 summary(model1)
 ```
+assess model performance: compare the model performance using the validation data
+```{r}
+# Calculate average arrdelay by predicted decile
+system.time(
+  model_deciles <- lapply(model_partition, function(x) {
+    sdf_predict(model1, x) %>%
+      mutate(decile = ntile(desc(prediction), 10)) %>%
+      group_by(decile) %>%
+      summarize(arrdelay = mean(arrdelay, na.rm = TRUE)) %>%
+      select(decile, arrdelay) %>%
+      collect()
+  })
+)
+
+model_deciles
+
+#create a summary dataset for plotting
+deciles <- rbind(
+  data.frame(data = 'train', model_deciles$train),
+  data.frame(data = 'valid', model_deciles$valid),
+  make.row.names = FALSE
+)
+deciles
+
+#plot average arrdelay by predicted decile
+deciles %>%
+  ggplot(aes(factor(decile), arrdelay, fill = data)) +
+  geom_bar(stat = 'identity', position = 'dodge') +
+  labs(title = 'Average arrdelay by predicted decile', x = 'Decile', y = 'Minutes')
+```
+
+0. Visualize and explain any other information you want to explore.
+```{r}
+
+```
+
+
 
 ```{r}
 spark_disconnect_all()
