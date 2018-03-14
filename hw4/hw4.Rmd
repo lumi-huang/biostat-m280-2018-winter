@@ -17,6 +17,7 @@ library(ggmap)
 library(stringr)
 library(maps)
 library(mapdata)
+library(Metrics)
 Sys.setenv(SPARK_HOME="/usr/lib/spark")
 config <- spark_config()
 sc <- spark_connect(master = "yarn-client", config = config)
@@ -284,16 +285,19 @@ model_data <- flights_tbl %>%
 
 
 
-#summarize data by carrier, month
-#linear reg model of arrdelay on distance, carriers, month, depdelay
+#summarize data by carrier
+#linear reg model of arrdelay on distance, carriers, depdelay
 model_data %>%
-  group_by(uniquecarrier, month) %>%
+  group_by(uniquecarrier) %>%
   summarize(description = min(description, na.rm = TRUE), 
             distance = mean(distance, na.rm = TRUE),
             arrdelay = mean(arrdelay, na.rm = TRUE),
             depdelay = mean(depdelay, na.rm = TRUE)) %>%
-  select(uniquecarrier, description, distance, month, arrdelay, depdelay) %>%
+  select(uniquecarrier, description, distance, arrdelay, depdelay) %>%
   arrange(arrdelay)
+
+
+
 
 #partition the data into training and validation sets
 model_partition <- model_data %>%
@@ -302,12 +306,14 @@ model_partition <- model_data %>%
 system.time(
   model1 <- model_partition$train %>%
   ml_linear_regression(arrdelay ~ 
-                         distance + uniquecarrier + month + depdelay)
+                         distance + uniquecarrier + depdelay)
 )
+
 
 #summarize the linear model
 summary(model1)
 ```
+
 assess model performance: compare the model performance using the validation data
 ```{r}
 #we don't have enough resources to run the exact same codes as lecture note, 
@@ -320,6 +326,11 @@ model_deciles <- sdf_predict(model1, model_partition$valid) %>%
   select(decile, arrdelay) %>%
   collect()
 
+model_deciles
+
+#calculate mse of predicted values and actual validation values
+valid_predict <- sdf_predict(model1, model_partition$valid)
+head(valid_predict)
 ```
 
 test data
@@ -334,13 +345,18 @@ data_2008 <- flights_tbl %>%
          dest, origin, arrdelay, depdelay)
 data_2008
 
-#group by carrier and month
+#group by carrier
 
 test_result <- sdf_predict(model1, data_2008) %>%
-  group_by(description, month) %>%
+  group_by(description) %>%
   summarize(arrdelay = mean(arrdelay), prediction = mean(prediction), freq = n()) %>%
   filter(freq > 10000) %>%
   collect()
+
+#test mse
+sdf_predict(model1, data_2008) %>%
+  mutate(res = prediction - arrdelay) %>%
+  summarise(mse = mean(res^2))
 
 test_result
 ```
@@ -358,13 +374,15 @@ top_airlines <- flights_tbl %>%
   arrange(desc(n))
 
 top_10_airlines <- as.data.frame(head(top_airlines, 10))
+top_10_airlines
+
 
 top_10_airlines %>%
-  ggplot() %>%
+  ggplot() + 
   geom_col(aes(x = uniquecarrier, y = n))
 ```
 
-
+In 2008, Southwest was the top 1 airlines in number of flights (1189365 flights), and American Airlines ranked 2.
 
 ```{r}
 spark_disconnect_all()
