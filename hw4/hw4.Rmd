@@ -270,26 +270,29 @@ base_map +
     
   
 ```{r}
-#fit a linear reg model of arrdelay on distance, carriers, month, dest, origin
+#might be overfitting -> predict mean squared (minimize this) -> compare with the training model -> final testing
+#fit a linear reg model of arrdelay on distance, carriers, month, depdelay
 model_data <- flights_tbl %>%
   filter(!is.na(arrdelay) & !is.na(depdelay) & !is.na(distance)) %>%
   filter(depdelay > 15 & depdelay < 240) %>%
   filter(arrdelay > -60 & arrdelay < 360) %>%
   filter(year >= 2003 & year <= 2007) %>%
-  left_join(airlines_tbl, by = c("uniquecarrier" = "code")) %>%
+  left_join(airlines_tbl, by = c("uniquecarrier" = "code"), copy = TRUE) %>%
   filter(!is.na(uniquecarrier)) %>%
   select(year, month, distance, uniquecarrier, description, 
-         dest, origin, arrdelay)
+         dest, origin, arrdelay, depdelay)
 
-#head(model_data)
 
-#summarize data by carrier, month, dest, origin
+
+#summarize data by carrier, month
+#linear reg model of arrdelay on distance, carriers, month, depdelay
 model_data %>%
-  group_by(uniquecarrier, month, dest, origin) %>%
+  group_by(uniquecarrier, month) %>%
   summarize(description = min(description, na.rm = TRUE), 
             distance = mean(distance, na.rm = TRUE),
-            arrdelay = mean(arrdelay, na.rm = TRUE)) %>%
-  select(uniquecarrier, description, distance, month, dest, origin, arrdelay) %>%
+            arrdelay = mean(arrdelay, na.rm = TRUE),
+            depdelay = mean(depdelay, na.rm = TRUE)) %>%
+  select(uniquecarrier, description, distance, month, arrdelay, depdelay) %>%
   arrange(arrdelay)
 
 #partition the data into training and validation sets
@@ -299,7 +302,7 @@ model_partition <- model_data %>%
 system.time(
   model1 <- model_partition$train %>%
   ml_linear_regression(arrdelay ~ 
-                         distance + uniquecarrier + month + dest + origin)
+                         distance + uniquecarrier + month + depdelay)
 )
 
 #summarize the linear model
@@ -307,6 +310,8 @@ summary(model1)
 ```
 assess model performance: compare the model performance using the validation data
 ```{r}
+sdf_predict(model1, model_partition$valid)
+
 # Calculate average arrdelay by predicted decile
 system.time(
   model_deciles <- lapply(model_partition, function(x) {
