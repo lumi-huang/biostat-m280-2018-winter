@@ -310,40 +310,58 @@ summary(model1)
 ```
 assess model performance: compare the model performance using the validation data
 ```{r}
-sdf_predict(model1, model_partition$valid)
-
+#we don't have enough resources to run the exact same codes as lecture note, 
+#instead, run this
 # Calculate average arrdelay by predicted decile
-system.time(
-  model_deciles <- lapply(model_partition, function(x) {
-    sdf_predict(model1, x) %>%
-      mutate(decile = ntile(desc(prediction), 10)) %>%
-      group_by(decile) %>%
-      summarize(arrdelay = mean(arrdelay, na.rm = TRUE)) %>%
-      select(decile, arrdelay) %>%
-      collect()
-  })
-)
+model_deciles <- sdf_predict(model1, model_partition$valid) %>%
+  mutate(decile = ntile(desc(prediction), 10)) %>%
+  group_by(decile) %>%
+  summarize(arrdelay = mean(arrdelay, na.rm = TRUE)) %>%
+  select(decile, arrdelay) %>%
+  collect()
 
-model_deciles
-
-#create a summary dataset for plotting
-deciles <- rbind(
-  data.frame(data = 'train', model_deciles$train),
-  data.frame(data = 'valid', model_deciles$valid),
-  make.row.names = FALSE
-)
-deciles
-
-#plot average arrdelay by predicted decile
-deciles %>%
-  ggplot(aes(factor(decile), arrdelay, fill = data)) +
-  geom_bar(stat = 'identity', position = 'dodge') +
-  labs(title = 'Average arrdelay by predicted decile', x = 'Decile', y = 'Minutes')
 ```
 
-0. Visualize and explain any other information you want to explore.
+test data
 ```{r}
+data_2008 <- flights_tbl %>%
+  filter(!is.na(arrdelay) & !is.na(depdelay) & !is.na(distance)) %>%
+  filter(depdelay > 15 & depdelay < 240) %>%
+  filter(arrdelay > -60 & arrdelay < 360) %>%
+  filter(year == 2008) %>%
+  left_join(airlines_tbl, by = c("uniquecarrier" = "code"), copy = TRUE) %>%
+  select(year, month, distance, uniquecarrier, description,
+         dest, origin, arrdelay, depdelay)
+data_2008
 
+#group by carrier and month
+
+test_result <- sdf_predict(model1, data_2008) %>%
+  group_by(description, month) %>%
+  summarize(arrdelay = mean(arrdelay), prediction = mean(prediction), freq = n()) %>%
+  filter(freq > 10000) %>%
+  collect()
+
+test_result
+```
+
+
+0. Visualize and explain any other information you want to explore.
+Top 10 airlines in 2008
+```{r}
+top_airlines <- flights_tbl %>% 
+  filter(year == 2008 & !is.na(uniquecarrier) & cancelled == 0) %>%
+  select(uniquecarrier) %>%
+  group_by(uniquecarrier) %>%
+  count() %>%
+  left_join(airlines_tbl, by = c("uniquecarrier" = "code"), copy = TRUE) %>%
+  arrange(desc(n))
+
+top_10_airlines <- as.data.frame(head(top_airlines, 10))
+
+top_10_airlines %>%
+  ggplot() %>%
+  geom_col(aes(x = uniquecarrier, y = n))
 ```
 
 
