@@ -6,12 +6,13 @@ author: Lumi Huang
 ---
 
 ```{r setup, include=FALSE}
-setwd(".")
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
 library(sparklyr)
 library(devtools)
 library(dplyr)
-#library(tidyverse)
 library(ggplot2)
 library(ggmap)
 library(stringr)
@@ -158,10 +159,6 @@ base_map +
 
 
 0. LAX:
-  
-    <p align="center">
-    ![](./lax-by-day-98-08.png)
-    </p>
 
     (a). Reproduce above plot. Visualize and explain some prominent features you observe. For example, what happened at points 1-5?
 ```{r}
@@ -305,10 +302,8 @@ model_partition <- model_data %>%
 #fit a linear model
 system.time(
   model1 <- model_partition$train %>%
-  ml_linear_regression(arrdelay ~ 
-                         distance + uniquecarrier + depdelay)
+    ml_linear_regression(arrdelay ~ distance + depdelay + uniquecarrier)
 )
-
 
 #summarize the linear model
 summary(model1)
@@ -329,8 +324,9 @@ model_deciles <- sdf_predict(model1, model_partition$valid) %>%
 model_deciles
 
 #calculate mse of predicted values and actual validation values
-valid_predict <- sdf_predict(model1, model_partition$valid)
-head(valid_predict)
+sdf_predict(model1, model_partition$valid) %>%
+  mutate(res = prediction - arrdelay) %>%
+  summarise(mse = mean(res^2, na.rm = TRUE))
 ```
 
 test data
@@ -349,16 +345,24 @@ data_2008
 
 test_result <- sdf_predict(model1, data_2008) %>%
   group_by(description) %>%
-  summarize(arrdelay = mean(arrdelay), prediction = mean(prediction), freq = n()) %>%
+  summarize(arrdelay = mean(arrdelay, na.rm = TRUE), 
+            prediction = mean(prediction, na.rm = TRUE), freq = n()) %>%
   filter(freq > 10000) %>%
   collect()
+
+test_result
 
 #test mse
 sdf_predict(model1, data_2008) %>%
   mutate(res = prediction - arrdelay) %>%
-  summarise(mse = mean(res^2))
+  summarise(mse = mean(res^2, na.rm = TRUE))
 
-test_result
+ggplot(test_result, aes(arrdelay, prediction)) + 
+  geom_point(alpha = 0.75, color = 'red', shape = 3) +
+  geom_abline(intercept = 0, slope = 1, alpha = 0.15, color = 'blue') +
+  geom_text(aes(label = substr(description, 1, 20)), size = 3, alpha = 0.75, vjust = -1) +
+  labs(title='Average Arrival Delay Forecast', x = 'Actual', y = 'Predicted')
+
 ```
 
 
