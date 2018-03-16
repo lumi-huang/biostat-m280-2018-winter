@@ -268,7 +268,7 @@ base_map +
   
 ```{r}
 #might be overfitting -> predict mean squared (minimize this) -> compare with the training model -> final testing
-#fit a linear reg model of arrdelay on distance, carriers, month, depdelay
+#fit a linear reg model of arrdelay on distance, carriers, depdelay
 model_data <- flights_tbl %>%
   filter(origin == "LAX") %>%
   filter(!is.na(arrdelay) & !is.na(depdelay) & !is.na(distance)) %>%
@@ -310,7 +310,7 @@ summary(model1)
 ```
 
 assess model performance: compare the model performance using the validation data
-```{r, eval = FALSE}
+```{r}
 #not enough resources to run this
 system.time(
   model_deciles <- lapply(model_partition, function(x) {
