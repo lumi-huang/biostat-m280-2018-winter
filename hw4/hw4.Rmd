@@ -268,7 +268,7 @@ base_map +
   
 ```{r}
 #might be overfitting -> predict mean squared (minimize this) -> compare with the training model -> final testing
-#fit a linear reg model of arrdelay on distance, carriers, month, depdelay
+#fit a linear reg model of arrdelay on distance, carriers, depdelay
 model_data <- flights_tbl %>%
   filter(origin == "LAX") %>%
   filter(!is.na(arrdelay) & !is.na(depdelay) & !is.na(distance)) %>%
@@ -310,7 +310,7 @@ summary(model1)
 ```
 
 assess model performance: compare the model performance using the validation data
-```{r, eval = FALSE}
+```{r}
 #not enough resources to run this
 system.time(
   model_deciles <- lapply(model_partition, function(x) {
@@ -338,9 +338,12 @@ deciles %>%
   geom_bar(stat = 'identity', position = 'dodge') +
   labs(title = 'Average arrival delay by predicted decile', x = 'Arrival Delay', y = 'Minutes')
 
+sdf_predict(model1, model_partition$valid) %>%
+  mutate(res = prediction - arrdelay) %>%
+  summarise(mse = mean(res^2, na.rm = TRUE))
 ```
 
-```{r}
+```{r, eval = FALSE}
 #Because we don't have enough resources to compare the model performance using the validation data, run this instead.
 # Calculate average arrdelay by predicted decile
 model_deciles <- sdf_predict(model1, model_partition$valid) %>%
@@ -361,6 +364,7 @@ sdf_predict(model1, model_partition$valid) %>%
 test data
 ```{r}
 data_2008 <- flights_tbl %>%
+  filter(origin == "LAX") %>%
   filter(!is.na(arrdelay) & !is.na(depdelay) & !is.na(distance)) %>%
   filter(depdelay > 15 & depdelay < 240) %>%
   filter(arrdelay > -60 & arrdelay < 360) %>%
