@@ -310,7 +310,7 @@ summary(model1)
 ```
 
 assess model performance: compare the model performance using the validation data
-```{r, eval = FALSE}
+```{r}
 #not enough resources to run this
 system.time(
   model_deciles <- lapply(model_partition, function(x) {
@@ -343,17 +343,17 @@ sdf_predict(model1, model_partition$valid) %>%
   summarise(mse = mean(res^2, na.rm = TRUE))
 ```
 
-```{r, eval = FALSE}
+```{r}
 #Because we don't have enough resources to compare the model performance using the validation data, run this instead.
 # Calculate average arrdelay by predicted decile
-model_deciles <- sdf_predict(model1, model_partition$valid) %>%
+model_deciles$valid <- sdf_predict(model1, model_partition$valid) %>%
   mutate(decile = ntile(desc(prediction), 10)) %>%
   group_by(decile) %>%
   summarize(arrdelay = mean(arrdelay, na.rm = TRUE)) %>%
   select(decile, arrdelay) %>%
   collect()
 
-model_deciles
+model_deciles$valid
 
 #calculate mse of predicted values and actual validation values
 sdf_predict(model1, model_partition$valid) %>%
